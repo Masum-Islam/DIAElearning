@@ -73,9 +73,8 @@ public class TeacherController {
     		List<Group> groups = groupService.findByUser(user);
     		
     		
-    		
     		model.addAttribute("assignment",new AssignmentDto());
-    		model.addAttribute("groups",groups);
+    		model.addAttribute("emails",groups);
     		
     	}
 		return "teacher/assignment";

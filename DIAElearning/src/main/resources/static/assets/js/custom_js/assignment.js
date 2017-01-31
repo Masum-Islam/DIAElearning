@@ -12,6 +12,7 @@ $().ready(function(){
 		  	
 		  	var $btn = $(this);
 		  	$btn.button('loading');
+		  	
 	    	var form_data = $('#assignmentForm').serialize() + "&" + post; 
 	    
 			$.post($(this).attr("action"), form_data, function(data) {

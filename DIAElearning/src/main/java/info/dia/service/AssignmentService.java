@@ -75,20 +75,33 @@ public class AssignmentService implements IAssignmentService{
 				//For duplicate email
 				HashMap<String,Long> emails = new HashMap<String,Long>();
 				
-				if (assignmentDto.getGroups()!=null) {
-					for (Group group : assignmentDto.getGroups()) {
+				/*if (assignmentDto.getEmails()!=null) {
+					
+					for (Group group : assignmentDto.getEmails()) {
 						
-						for (GroupDetails groupDetails : group.getGroupDetails()) {
-							emails.put(groupDetails.getEmail(),group.getId());
+						if (group.getGroupDetails()!=null) {
+							for (GroupDetails groupDetails : group.getGroupDetails()) {
+								emails.put(groupDetails.getEmail(),group.getId());
+							}
 						}
-						
+					}
+				}*/
+				
+				if (assignmentDto.getEmails()!=null) {
+					for (GroupDetails groupDetails : assignmentDto.getEmails()) {
+						LOGGER.info("Before Email :"+groupDetails.getEmail()+"--->Group Id :"+groupDetails.getGroup().getId());
+						emails.put(groupDetails.getEmail(),groupDetails.getGroup().getId());
 					}
 				}
+				
+				LOGGER.info("Total Email Size:"+emails.size());
 				
 				if (emails.size()>0) {
 					for (Map.Entry<String, Long> entry : emails.entrySet()) {
 						
 						AssignmentStudent assignmentStudent = new AssignmentStudent();
+						
+						LOGGER.info("After Email :"+entry.getKey()+"--->Group Id :"+entry.getValue());
 						
 						Group group = groupRepository.findOne(entry.getValue());
 						

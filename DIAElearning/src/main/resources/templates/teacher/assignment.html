@@ -65,11 +65,9 @@
 										<div class="col-sm-2">
 											<!--Column right-->
 											<div class="form-group">
-												<label th:text="#{label.assignment.session}"
-													class="control-label">Session</label> <input type="text"
-													th:field="*{session}" class="form-control" /> <span
-													id="sessionError" class="text-danger"
-													style="display: none"></span>
+												<label th:text="#{label.assignment.session}" class="control-label">Session</label> 
+												<input type="text" th:field="*{session}" class="form-control" /> 
+												<span id="sessionError" class="text-danger"	style="display: none"></span>
 											</div>
 										</div>
 										
@@ -118,26 +116,35 @@
 										<div class="col-sm-6">
 											<div class="form-group">
 												<label th:text="#{label.group.selectGroup}" class="control-label">Select Group</label> 
-												<select th:field="*{groups}" class="selectpicker" multiple data-actions-box="true" data-live-search="true" data-selected-text-format="count>2">
+												
+												<select th:field="*{emails}" name="emails[]" class="selectpicker" multiple data-actions-box="true" data-live-search="true" data-selected-text-format="count>2">
 													
-													<optgroup  th:each="group: ${groups}"	th:label="${group.name}" data-collapsible-optgroup="true" data-load-collapse-optgroup="false">
+													<optgroup  th:each="group: ${emails}"	th:label="${group.name}" data-collapsible-optgroup="true" data-load-collapse-optgroup="false">
 																
-														<option th:each="groupDetails: ${group.groupDetails}"
-																th:value="${groupDetails.group.id}"
+														<option th:each="groupDetails : ${group.groupDetails}"
+																th:value="${groupDetails.id}"
 																th:text="${groupDetails.email}" data-icon="glyphicon glyphicon-envelope" >
-														
 														Group Email</option>
+														
+														<!-- <option th:each="group: ${emails}"
+																th:value="${group.id}"
+																th:text="${group.name}" data-icon="glyphicon glyphicon-envelope" >
+														Group Email</option> -->
+														
 														
 													</optgroup>
 																										
 												</select>
+												
 											</div>
 										</div>
 										
 										<div class="col-sm-6">
 											<div class="form-actions" style="text-align: right;">
-												<input  data-loading-text="<i class=\'fa fa-spinner fa-spin\'>Loading...</i>" class="btn blue" id="save" name="save" value="Save" type="submit"></input>
-												<input  data-loading-text="Loading..." class="btn blue" id="saveAndPublised" name="published" value="Published" type="submit"></input>
+											
+												<input  class="btn blue" data-loading-text="Processing Request..." id="save" name="save" value="Save" type="submit"></input>
+												<input  class="btn blue" data-loading-text="Processing Request..." id="saveAndPublised" name="published" value="Published" type="submit"></input>
+												
 											</div>
 										</div>
 										

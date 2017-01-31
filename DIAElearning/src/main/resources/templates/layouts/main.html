@@ -331,6 +331,36 @@ $('.selectpicker').selectpicker({
 	  /* dropupAuto: false */
 });
 	
+/* $(function() {
+
+	  $('.selectpicker').on('change', function(){
+	    var selected = []; //array to store value
+	    $(this).find("option:selected").each(function(key,value){
+	        selected.push(value.innerHTML); //push the text to array
+	    });
+	    
+	    console.log(selected);
+	    
+	  });
+	  
+}); */
+	
+/* $('#multiselect1').multiselect({
+    selectAllValue: 'multiselect-all',
+    enableCaseInsensitiveFiltering: true,
+    enableFiltering: true,
+    maxHeight: '300',
+    buttonWidth: '235',
+    onChange: function(element, checked) {
+        var brands = $('#multiselect1 option:selected');
+        var selected = [];
+        $(brands).each(function(index, brand){
+            selected.push([$(this).val()]);
+        });
+
+        console.log(selected);
+    }
+});  */
 
 var date = new Date();
 date.setDate(date.getDate()-1);

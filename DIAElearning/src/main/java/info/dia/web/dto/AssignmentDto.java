@@ -2,16 +2,17 @@ package info.dia.web.dto;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import info.dia.persistence.model.Group;
+import info.dia.persistence.model.GroupDetails;
 
 public class AssignmentDto implements Serializable{
 
@@ -24,21 +25,22 @@ public class AssignmentDto implements Serializable{
 	private String title;
 	
 	@NotNull(message="{NotNull.assignmentDto.session}")
+	@Pattern(regexp = "red|blue|green|pink", flags = Pattern.Flag.CASE_INSENSITIVE,message="{regexp.assignmentDto.session}")
 	private String session;
 	
+	@NotNull(message="{NotNull.assignmentDto.submitStartDate}")
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat ( pattern="yyyy-MM-dd HH:mm")
 	private Date submitStartDate;
 	
+	@NotNull(message="{NotNull.assignmentDto.submitEndDate}")
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat ( pattern="yyyy-MM-dd HH:mm")
 	private Date submitEndDate;
 	
-	
 	private String instructions;
 	
-	private HashSet<Group> groups;
-	
+	private List<GroupDetails> emails;
 
 
 	public long getId() {
@@ -101,14 +103,15 @@ public class AssignmentDto implements Serializable{
 	}
 
 
-	public HashSet<Group> getGroups() {
-		return groups;
+	public List<GroupDetails> getEmails() {
+		return emails;
 	}
 
 
-	public void setGroups(HashSet<Group> groups) {
-		this.groups = groups;
+	public void setEmails(List<GroupDetails> emails) {
+		this.emails = emails;
 	}
-
+	
+	
 	
 }
