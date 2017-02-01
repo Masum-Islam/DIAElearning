@@ -148,7 +148,9 @@ public class AssignmentService implements IAssignmentService{
     			dto.setTitle(assignment.getTitle());
     			dto.setSession(assignment.getSession());
     			dto.setInstructions(assignment.getInstructions());
-    			
+				dto.setSubmitStartDate(assignment.getSubmitStartDate());
+				dto.setSubmitEndDate(assignment.getSubmitEndDate());
+
     			if (assignment.getAssignmentStudents().size()>0) {
 					
     				for (AssignmentStudent assignmentStudent : assignment.getAssignmentStudents()) {
