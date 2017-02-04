@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layouts/main">
+	
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{label.pages.teacher.assignmentList}">Title</title>
+</head>
+<body>
+		<th:block layout:fragment="script">
+
+		<!-- <link rel="stylesheet"	th:href="@{/assets/css/jquery.dataTables.min.css}">
+		<link th:href="@{/assets/css/dataTables.colVis.css}" rel="stylesheet"	type="text/css">
+
+		<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+		<script th:src="@{/assets/js/dataTables.colVis.js}"></script>
+		<script th:src="@{/assets/js/jquery.dataTables.columnFilter.js}"></script>
+		<script th:src="@{/assets/js/fnStandingRedraw.js}"></script>
+		<script th:src="@{/assets/js/fnSetFilteringDelay.js}"></script> -->
+		<link th:href="@{/assets/css/bootstrap-select_1.css}" rel="stylesheet" type="text/css" />
+        <script th:src="@{/assets/js/bootstrap-select_1.js}"></script>
+		<script th:src="@{/assets/js/custom_js/pagination.js}"></script>
+
+		<!-- <script>
+       
+			$('.selectpicker').selectpicker({
+				style : 'btn-info',
+			});
+			
+		</script> -->
+       </th:block>
+       
+<div layout:fragment="content">
+       
+       <div class="page-content-inner">
+			<div class="row">
+					<!-- BEGIN SAMPLE FORM PORTLET-->
+					<div class="portlet light ">
+						<div class="portlet-title">
+							<div class="caption font-red-sunglo">
+								<i class="icon-settings font-red-sunglo"></i> <span
+									class="caption-subject bold">Assignment List</span>
+							</div>
+							<div class="actions">
+								<div class="btn-group">
+									<a class="btn btn-sm green btn-outline dropdown-toggle" href="javascript:;"
+										data-toggle="dropdown"> Actions <i
+										class="fa fa-angle-down"></i>
+									</a>
+									<ul class="dropdown-menu pull-right">
+										<li><a th:href="@{/teacher/assignment}"><i class="fa fa-plus-circle"></i>Create Assignment</a></li>
+										<li><a th:href="@{/teacher/assignments}"> <i class="fa fa-eye"></i>View Assignments</a></li>
+										<li><a href="javascript:;"> <i class="fa fa-pencil"></i>Edit Assignment</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div id ="resultsBlock" class="portlet-body form">
+
+							<table id="allAssignmentTable" class="table table-striped table-bordered table-list" cellspacing="0"	width="100%">
+
+								<thead>
+									<tr>
+										<!-- <th></th> -->
+										<th>Title</th>
+										<th>Session</th>
+										<th><span data-toggle="tooltip" data-placement="top" title="Assignment Status" class="glyphicon glyphicon-stats"></span></th>
+										<th><span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span></th>
+										<th><span data-toggle="tooltip" data-placement="top" title="No. of Students" class="fa fa-users"></span></th>
+										<th><span data-toggle="tooltip" data-placement="top" title="Submitted" class="fa fa-upload"></span></th>
+										<th>Time Remains</th>
+										<th><span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span></th>
+									</tr>
+								</thead>
+								<tbody th:if="${not #lists.isEmpty(assignmentInfoDtos)}">
+									<tr th:each="assignmentInfoDto,rowStat : ${assignmentInfoDtos}">
+										<!-- <td th:text="${rowStat.count}">1</td> -->
+										<td th:text="${assignmentInfoDto.title}">Title</td>
+										<td th:text="${assignmentInfoDto.session}">Session</td>
+										
+										<td th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-info'"  th:if="${assignmentInfoDto.status} == true">Published</td>
+										<td th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-info'"  th:if="${assignmentInfoDto.status} == false">Saved</td>
+										
+										<td th:text="${assignmentInfoDto.submitEndDate} ? ${#calendars.format(assignmentInfoDto.submitEndDate,'yyyy-MM-dd hh:mm a')}">Last date of submission</td>
+										
+										<td th:text="${assignmentInfoDto.totalNumberOfStudent}">No. Of Students</td>
+										
+										<td th:text="${assignmentInfoDto.totalNumberOfSubmittedStudent}">Submitted</td>
+
+										<td>Time Remains</td>
+										<td><a href="#"><span data-toggle="tooltip" data-placement="top" title="Edit Assignment " class="glyphicon glyphicon-pencil"></span></a>
+											<a href="#"><span data-toggle="tooltip" data-placement="top" title="Download Assignment " class="fa fa-download"></span></a>
+											<a href="#"><span data-toggle="tooltip" data-placement="top" title="Delete Assignment" class="glyphicon glyphicon-trash"></span></a></td>
+									</tr>
+								</tbody>
+								
+								<tbody th:if="${#lists.isEmpty(assignmentInfoDtos)}">
+									<tr>
+										<td class="alert alert-warning" align="center" colspan="8">No Assignment Found!</td>
+									</tr>
+								</tbody>
+							</table>
+
+						</div>
+						
+						
+					</div>
+			</div>
+			<div class="row">
+			<div class="form-group col-md-1">
+				<select class="form-control pagination selectpicker" id="pageSizeSelect">
+					<option th:each="pageSize : ${pageSizes}" th:text="${pageSize}" th:value="${pageSize}" th:selected="${pageSize} == ${selectedPageSize}"></option>
+				</select>
+			</div>
+			<div id="pagination" th:if="${assignments.getTotalPages() != 1}" class="form-group col-md-11 pagination-centered">
+				<ul  class="pagination">
+					<!-- <li th:class="${assignments.getNumber() == 0} ? disabled"><a class="pageLink" th:href="@{/teacher/assignments/(pageSize=${selectedPageSize}, page=1)}">&laquo;</a></li>
+					<li th:class="${assignments.getNumber() == 0} ? disabled"><a class="pageLink" th:href="@{/teacher/assignments/(pageSize=${selectedPageSize}, page=${assignments.getNumber()})}">&larr;</a></li>
+					<li th:class="${assignments.getNumber() == (page - 1)} ? 'active pointer-disabled'"	th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}"><a class="pageLink"  th:href="@{/teacher/assignments/(pageSize=${selectedPageSize},page=${page})}" th:text="${page}"></a></li>
+					<li th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a class="pageLink" th:href="@{/teacher/assignments/(pageSize=${selectedPageSize}, page=${assignments.getNumber() + 2})}">&rarr;</a></li>
+					<li th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a class="pageLink" th:href="@{/teacher/assignments/(pageSize=${selectedPageSize},page=${assignments.getTotalPages()})}">&raquo;</a></li> -->
+					
+					<li th:class="${assignments.getNumber() == 0} ? disabled"><a class="pageLink" href="javascript:void(0);" th:onclick="'javascript:getAssignmentList(\'' + ${selectedPageSize} +'\',\''+ 1 + '\',this);'">&laquo;</a></li>
+					<li th:class="${assignments.getNumber() == 0} ? disabled"><a class="pageLink" href="javascript:void(0);" th:onclick="'javascript:getAssignmentList(\'' + ${selectedPageSize} +'\',\''+ ${assignments.getNumber()} + '\',this);'">&larr;</a></li>
+					<li th:class="${assignments.getNumber() == (page - 1)} ? 'active pointer-disabled'"	th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}">
+					<a class="pageLink" href="javascript:void(0);" th:onclick="'javascript:getAssignmentList(\'' + ${selectedPageSize} +'\',\''+ ${page} + '\',this);'" th:text="${page}"></a></li>
+					<li th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a class="pageLink" href="javascript:void(0);" th:onclick="'javascript:getAssignmentList(\'' + ${selectedPageSize} +'\',\''+ ${assignments.getNumber() + 2} + '\',this);'">&rarr;</a></li>
+					<li th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a class="pageLink" href="javascript:void(0);" th:onclick="'javascript:getAssignmentList(\'' + ${selectedPageSize} +'\',\''+ ${assignments.getTotalPages()} + '\',this);'">&raquo;</a></li>
+					
+				</ul>
+			</div>
+		</div>
+		
+		</div>
+   </div>
+</body>
+</html>
