@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+</head>
+<body>
+	<div th:fragment="search">
+
+		<div class="col-sm-6">
+
+			<form id="searchForm" action="#"
+				th:action="@{/teacher/assignments/search}" th:object="${searchDTO}">
+				<div class="input-group">
+					<input id="searchAssignment" type="text" th:field="*{searchString}"	class="form-control" placeholder="Search assignment...">
+					  <span	class="input-group-btn">
+						<button class="btn purple" type="submit">
+							<i class="glyphicon glyphicon-search"></i>
+						</button>
+					</span>
+				</div>
+			</form>
+
+		</div>
+
+		<div class="col-sm-6">
+			<div class="clearfix pull-right">
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn blue active"> <input type="radio"
+						class="toggle"> Published
+					</label> <label class="btn blue"> <input type="radio"
+						class="toggle"> Saved
+					</label> <label class="btn blue"> <input type="radio"
+						class="toggle"> All
+					</label>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

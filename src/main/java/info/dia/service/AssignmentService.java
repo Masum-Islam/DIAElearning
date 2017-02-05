@@ -17,6 +17,9 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.mysema.query.BooleanBuilder;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
@@ -25,9 +28,11 @@ import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
 import info.dia.persistence.model.Group;
 import info.dia.persistence.model.GroupDetails;
+import info.dia.persistence.model.QAssignment;
 import info.dia.persistence.model.User;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
+import info.dia.web.dto.SearchDTO;
 import info.dia.web.util.AssignmentMapper;
 
 @Service
@@ -151,28 +156,6 @@ public class AssignmentService implements IAssignmentService{
 	}
 
 
-
-
-
-
-	@Override
-	public List<AssignmentDto> findByTitleLikeIgnoreCase(String title) {
-
-		
-		return null;
-	}
-
-
-
-
-
-
-	@Override
-	public List<AssignmentDto> findBySessionLikeIgnoreCase(String session) {
-
-		return null;
-	}
-	
 		
 	boolean isObjectInSet(GroupDetails object, Set<GroupDetails> set) {
 		
@@ -188,4 +171,33 @@ public class AssignmentService implements IAssignmentService{
 		   return result;
 	}
 
+
+	@Override
+	public List<AssignmentInfoDto> findByStatus(User user, boolean status, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Page<Assignment> searchRequests(User user, SearchDTO searchDTO, Pageable p) {
+		
+		BooleanBuilder b = new BooleanBuilder();
+		
+		
+		
+		QAssignment qAssignment = QAssignment.assignment;
+		if (searchDTO != null) {
+			if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
+				b = b.and(qAssignment.id.like(searchDTO.getSearchString())
+						.or(qAssignment.title.containsIgnoreCase(searchDTO.getSearchString()))
+						.or(qAssignment.session.containsIgnoreCase(searchDTO.getSearchString()))
+						.and(qAssignment.user.id.eq(user.getId())));
+			}
+		}
+		
+		LOGGER.info("user :"+user.toString()+" Search Find :"+assignmentRepository.findAll(b, p).getTotalElements());
+		
+		return assignmentRepository.findAll(b, p);
+	}
 }

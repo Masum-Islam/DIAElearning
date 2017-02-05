@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -17,17 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
@@ -41,8 +42,10 @@ import info.dia.service.IUserService;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
 import info.dia.web.dto.GroupDto;
+import info.dia.web.dto.SearchDTO;
 import info.dia.web.util.AssignmentMapper;
 import info.dia.web.util.GenericResponse;
+import info.dia.web.util.HelperUtils;
 
 @Controller
 @RequestMapping(value="/teacher")
@@ -74,7 +77,7 @@ public class TeacherController {
 	private static final int INITIAL_PAGE = 0;
 	private static final int INITIAL_PAGE_SIZE = 5;
 	private static final int[] PAGE_SIZES = { 5, 10, 20 };
-
+	private static final String DEFAULT_SORT_STRING = "id";
 	
 	
 	
@@ -168,39 +171,84 @@ public class TeacherController {
 	
 	
 	@RequestMapping(value="/assignments", method=RequestMethod.GET)
-	public ModelAndView allAssignmentInformation(@RequestParam(value = "pageSize", required = false) Integer pageSize,
-			 									 @RequestParam(value = "page", required = false) Integer page){
-		
-				ModelAndView modelAndView = new ModelAndView("/teacher/assignmentList");
-		
-				// Evaluate page size. If requested parameter is null, return initial
-				// page size
-				int evalPageSize = pageSize == null ? INITIAL_PAGE_SIZE : pageSize;
-				
-				// Evaluate page. If requested parameter is null or less than 0 (to
-				// prevent exception), return initial size. Otherwise, return value of
-				// param. decreased by 1.
-				int evalPage = (page == null || page < 1) ? INITIAL_PAGE : page - 1;
-				
+	public String allAssignmentInformationByUser(Model model,@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection){
+
 				Authentication authentication = authenticationFacade.getAuthentication();
 		    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
 		    		
 		    		User user = userService.findUserByEmail(authentication.getName());
 		    		
-		    		Page<Assignment> assignments = assignmentRepository.findByUser(user,new PageRequest(evalPage, evalPageSize,Sort.Direction.DESC,"submitStartDate","submitEndDate"));
+		    		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		    		
+		    		Page<Assignment> assignments = assignmentRepository.findByUser(user,pageRequest);
 		    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
 		    		
 		    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignments.getTotalPages(),assignments.getNumber(),BUTTONS_TO_SHOW);
 		    		
-		    		modelAndView.addObject("assignmentInfoDtos", assignmentInfoDtos);
-		    		modelAndView.addObject("assignments", assignments);
-		    		modelAndView.addObject("selectedPageSize", evalPageSize);
-		    		modelAndView.addObject("pageSizes", PAGE_SIZES);
-		    		modelAndView.addObject("pager", pager);
-		    		
+		    		model.addAttribute("assignmentInfoDtos", assignmentInfoDtos);
+		    		model.addAttribute("assignments", assignments);
+		    		model.addAttribute("pager", pager);
+		    		model.addAttribute("searchDTO", new SearchDTO());
 		    		
 		     }
-		return modelAndView;
+		return "/teacher/assignmentList";
+	}
+	
+	
+	@RequestMapping(value = "/assignments/search",method=RequestMethod.GET)
+	public String search(
+			Model model,
+			HttpSession session,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection,
+			@ModelAttribute("searchDTO") SearchDTO searchDTO) {
+		
+		
+		LOGGER.info("Search Method Called!");
+		
+		SearchDTO sessionSearchDTO = (SearchDTO) session.getAttribute("searchDTO");
+		
+		if (sessionSearchDTO != null && page != null) {
+			searchDTO = sessionSearchDTO;
+		}
+		
+		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		
+		
+		
+		return searchAssignment(model, session, searchDTO, pageRequest);
+	}
+	
+	
+	public String searchAssignment(Model model, HttpSession session, SearchDTO searchDTO,PageRequest pageRequest){
+		
+		Authentication authentication = authenticationFacade.getAuthentication();
+		
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		
+    		User user = userService.findUserByEmail(authentication.getName());
+
+    		Page<Assignment> assignments = assignmentService.searchRequests(user,searchDTO,pageRequest);
+    		
+    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
+    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignments.getTotalPages(),assignments.getNumber(),BUTTONS_TO_SHOW);
+    		
+    		model.addAttribute("assignmentInfoDtos", assignmentInfoDtos);
+    		model.addAttribute("assignments", assignments);
+    		model.addAttribute("pager", pager);
+    		model.addAttribute("searchDTO", searchDTO != null ? searchDTO: new Assignment());
+    		model.addAttribute("isSearch", "true");
+    		session.setAttribute("searchDTO", searchDTO);
+    		
+    	}
+    	
+    	/*return "/teacher/searchAssignments :: searchAssignments";*/
+    	return "/teacher/assignmentList";
 	}
 
 	/**
@@ -211,8 +259,8 @@ public class TeacherController {
 	 * @return model and view
 	 */
 	
-	@RequestMapping(value="/getAssignmentList", method=RequestMethod.GET)
-	public String retriveAssignments(Model model,@RequestParam(value = "pageSize", required = false) Integer pageSize,
+	/*@RequestMapping(value="/getAssignmentList", method=RequestMethod.GET)
+	public String allAssignmentInformationByUser(Model model,@RequestParam(value = "pageSize", required = false) Integer pageSize,
 												 @RequestParam(value = "page", required = false) Integer page){
 		
 		// Evaluate page size. If requested parameter is null, return initial
@@ -242,7 +290,7 @@ public class TeacherController {
     	}
 
     	return "/teacher/assignments :: assignments";
-	}
+	}*/
 	
 	
 	

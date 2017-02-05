@@ -2,11 +2,15 @@ package info.dia.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
+import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.User;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
+import info.dia.web.dto.SearchDTO;
 
 public interface IAssignmentService {
 	
@@ -14,8 +18,7 @@ public interface IAssignmentService {
 	
 	List<AssignmentInfoDto> findByUser(User user, Pageable pageable);
 	
-	List<AssignmentDto> findByTitleLikeIgnoreCase(String title);
+	List<AssignmentInfoDto> findByStatus(User user,boolean status,Pageable pageable);
 	
-	List<AssignmentDto> findBySessionLikeIgnoreCase(String session);
-
+	Page<Assignment> searchRequests(User user,SearchDTO searchDTO, Pageable p);
 }

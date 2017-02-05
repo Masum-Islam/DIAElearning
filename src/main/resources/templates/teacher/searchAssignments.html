@@ -4,8 +4,8 @@
 <head>
 </head>
 <body>
-	<div class="form-group"  th:fragment="assignments" th:unless="${#lists.isEmpty(assignmentInfoDtos)}">
-		<!-- <div > -->
+	<div class="form-group"  th:fragment="searchAssignments" th:unless="${#lists.isEmpty(assignmentInfoDtos)}">
+		
 			<table id="allAssignmentTable" class="table table-striped table-bordered table-list" cellspacing="0"	width="100%">
 
 								<thead>
@@ -50,7 +50,37 @@
 									</tr>
 								</tbody>
 							</table>
-		<!-- </div> -->
+							
+						<div class="row">
+							<div th:if="${assignments.getTotalPages() > 0}">
+								<div th:if="${assignments.getTotalPages() > 1}"
+									class="form-group col-sm-12 col-md-12 col-lg-12 pagination-centered">
+									<ul class="pagination">
+										<li th:class="${assignments.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/assignments/search( page=1,oldDirection=${oldDirection},oldSortString=${oldSortString})}">&laquo;</a></li>
+										<li th:class="${assignments.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/assignments/search( page=${assignments.getNumber()},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&larr;</a></li>
+										<li
+											th:class="${assignments.getNumber() == (page - 1)} ? 'active pointer-disabled'"
+											th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}"><a
+											class="pageLink"
+											th:href="@{/teacher/assignments/search( page=${page},oldDirection=${oldDirection},oldSortString=${oldSortString})}"
+											th:text="${page}"></a></li>
+										<li
+											th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/assignments/search( page=${assignments.getNumber() + 2},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&rarr;</a></li>
+										<li
+											th:class="${assignments.getNumber() + 1 == assignments.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/assignments/search(page=${assignments.getTotalPages()})}">&raquo;</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+		
 	</div>
 </body>
 </html>
