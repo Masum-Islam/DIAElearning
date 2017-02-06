@@ -183,20 +183,35 @@ public class AssignmentService implements IAssignmentService{
 	public Page<Assignment> searchRequests(User user, SearchDTO searchDTO, Pageable p) {
 		
 		BooleanBuilder b = new BooleanBuilder();
-		
-		
-		
+
 		QAssignment qAssignment = QAssignment.assignment;
+
 		if (searchDTO != null) {
-			if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
-				b = b.and(qAssignment.id.like(searchDTO.getSearchString())
-						.or(qAssignment.title.containsIgnoreCase(searchDTO.getSearchString()))
+			
+			if (!StringUtils.isEmpty(searchDTO.getSearchString()) && searchDTO.getAssignmentStatus()!=null) {
+				b = b.and(qAssignment.title.containsIgnoreCase(searchDTO.getSearchString())
+						.or(qAssignment.session.containsIgnoreCase(searchDTO.getSearchString()))
+						.or(qAssignment.status.eq(searchDTO.getAssignmentStatus()))
+						.and(qAssignment.user.id.eq(user.getId())));
+				LOGGER.info(" String and Boolean.............");
+			}else if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
+				b = b.and(qAssignment.title.containsIgnoreCase(searchDTO.getSearchString())
 						.or(qAssignment.session.containsIgnoreCase(searchDTO.getSearchString()))
 						.and(qAssignment.user.id.eq(user.getId())));
+				LOGGER.info("String.............");
+			}else if (searchDTO.getAssignmentStatus()!=null) {
+				b = b.and(qAssignment.status.eq(searchDTO.getAssignmentStatus()))
+						.and(qAssignment.user.id.eq(user.getId()));
+				
+				LOGGER.info("Boolean.............");
+				
+			}else {
+				LOGGER.info("Nothing.............");
+				b = b.and(qAssignment.user.id.eq(user.getId()));
 			}
 		}
 		
-		LOGGER.info("user :"+user.toString()+" Search Find :"+assignmentRepository.findAll(b, p).getTotalElements());
+		LOGGER.info("user email :"+user.getEmail()+" Search Find :"+assignmentRepository.findAll(b, p).getTotalElements());
 		
 		return assignmentRepository.findAll(b, p);
 	}

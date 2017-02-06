@@ -3,6 +3,8 @@ package info.dia.web.dto;
 public class SearchDTO {
 	
 	private String searchString;
+	
+	private Boolean assignmentStatus;
 
 	public String getSearchString() {
 		return searchString;
@@ -12,4 +14,20 @@ public class SearchDTO {
 		this.searchString = searchString;
 	}
 
+	public Boolean getAssignmentStatus() {
+		return assignmentStatus;
+	}
+
+	public void setAssignmentStatus(Boolean assignmentStatus) {
+		this.assignmentStatus = assignmentStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "SearchDTO [searchString=" + searchString + ", assignmentStatus=" + assignmentStatus + "]";
+	}
+	
+	
+	
+	
 }

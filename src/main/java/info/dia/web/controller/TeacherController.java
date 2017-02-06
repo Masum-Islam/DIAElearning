@@ -77,7 +77,7 @@ public class TeacherController {
 	private static final int INITIAL_PAGE = 0;
 	private static final int INITIAL_PAGE_SIZE = 5;
 	private static final int[] PAGE_SIZES = { 5, 10, 20 };
-	private static final String DEFAULT_SORT_STRING = "id";
+	private static final String DEFAULT_SORT_STRING = "submitStartDate";
 	
 	
 	
@@ -181,9 +181,12 @@ public class TeacherController {
 		    		
 		    		User user = userService.findUserByEmail(authentication.getName());
 		    		
-		    		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		    		PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
 		    		
 		    		Page<Assignment> assignments = assignmentRepository.findByUser(user,pageRequest);
+		    		
+		    		LOGGER.info("User email 1:"+user.getEmail()+" Search Find :"+assignments.getTotalElements());
+		    		
 		    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
 		    		
 		    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignments.getTotalPages(),assignments.getNumber(),BUTTONS_TO_SHOW);
@@ -209,7 +212,7 @@ public class TeacherController {
 			@ModelAttribute("searchDTO") SearchDTO searchDTO) {
 		
 		
-		LOGGER.info("Search Method Called!");
+		/*LOGGER.info("Search Method Called!"+" with search string :"+searchDTO.getSearchString()+" and boolean value:"+searchDTO.getAssignmentStatus());*/
 		
 		SearchDTO sessionSearchDTO = (SearchDTO) session.getAttribute("searchDTO");
 		
@@ -245,9 +248,10 @@ public class TeacherController {
     		model.addAttribute("isSearch", "true");
     		session.setAttribute("searchDTO", searchDTO);
     		
+    		LOGGER.info("Search String:"+searchDTO.getSearchString()+" and boolean value: "+searchDTO.getAssignmentStatus());
+    		
     	}
     	
-    	/*return "/teacher/searchAssignments :: searchAssignments";*/
     	return "/teacher/assignmentList";
 	}
 

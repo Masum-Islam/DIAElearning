@@ -32,7 +32,7 @@
 		</script> -->
        </th:block>
        
-<div layout:fragment="content">
+<div layout:fragment="content" id="content">
        
        <div class="page-content-inner">
 			<div class="row">
@@ -60,35 +60,9 @@
 					
 					
 					
-					<div class="row">
-						
+					
 						<th:block th:include="fragments/search :: search"></th:block>
-						
-						<!-- <div class="col-sm-6">
-						
-						<form id="searchForm" action="#" th:action="@{/teacher/assignments/search}" th:object="${searchDTO}">
-							<div class="input-group">
-								<input id="searchAssignment" type="text" th:field="*{searchString}" class="form-control"	placeholder="Search assignment..."> 
-								<input id="searchAssignment" type="text" name="searchString" class="form-control"	placeholder="Search assignment..."> 
-								<span class="input-group-btn">
-									<button class="btn purple" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-								</span>
-							</div>
-						</form>
-						
-						</div>
-						
-						<div class="col-sm-6">
-							<div class="clearfix pull-right">
-								<div class="btn-group" data-toggle="buttons">
-									<label class="btn blue active"> <input type="radio"	class="toggle"> Published </label> 
-									<label class="btn blue"> <input type="radio" class="toggle"> Saved</label> 
-									<label class="btn blue"> <input type="radio" class="toggle"> All </label>
-								</div>
-							</div>
-						</div> -->
-						
-					</div>
+					
 					
 					
 					
@@ -98,11 +72,11 @@
 
 								<thead>
 									<tr>
-										<!-- <th></th> -->
 										<th>Title</th>
 										<th>Session</th>
+								
 										<th><span data-toggle="tooltip" data-placement="top" title="Assignment Status" class="glyphicon glyphicon-stats"></span></th>
-										<th><span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span></th>
+										<th><span data-toggle="tooltip" data-placement="top" title="Submission Date" class="glyphicon glyphicon-time"></span></th>
 										<th><span data-toggle="tooltip" data-placement="top" title="No. of Students" class="fa fa-users"></span></th>
 										<th><span data-toggle="tooltip" data-placement="top" title="Submitted" class="fa fa-upload"></span></th>
 										<th>Time Remains</th>
@@ -118,7 +92,7 @@
 										<td th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentInfoDto.status} == true">Published</td>
 										<td th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentInfoDto.status} == false">Saved</td>
 										
-										<td th:text="${assignmentInfoDto.submitEndDate} ? ${#calendars.format(assignmentInfoDto.submitEndDate,'yyyy-MM-dd hh:mm a')}">Last date of submission</td>
+										<td th:text="${assignmentInfoDto.submitEndDate} ? ${#calendars.format(assignmentInfoDto.submitStartDate,'dd MMM yyyy hh:mm a')+' to '+#calendars.format(assignmentInfoDto.submitEndDate,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
 										
 										<td th:text="${assignmentInfoDto.totalNumberOfStudent}">No. Of Students</td>
 										
@@ -203,12 +177,11 @@
 								</div>
 							</div>
 						</div>
-						
-						</div>
-						
 					</div>
 				</div>
-			</div>
+			
+		</div>
+	</div>
 			<!-- <div class="row">
 			<div class="form-group col-md-1">
 				<select class="form-control pagination selectpicker" id="pageSizeSelect">

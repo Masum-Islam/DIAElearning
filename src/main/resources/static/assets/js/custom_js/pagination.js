@@ -12,6 +12,40 @@ function changePageAndSize() {
 	});
 }
 
+/*$(document).ready(function(){
+	$('input[type=radio][name=assignmentStatus]').change(function(){
+		if (this.value == 'true') {
+            console.log("published");
+        }
+        else if (this.value == 'false') {
+        	console.log("saved");
+        }else{
+        	console.log("All");
+        }
+	});
+});*/
+
+/*$(document).ready(function() {
+	   
+	  $('#searchForm').submit(function(event) {
+	       
+		 var formData = $('#searchForm').serialize();
+	       
+	    $.ajax({
+	        url: $("#searchForm").attr( "action"),
+	        data: formData,
+	        type : "GET",
+	        success: function(data) {
+	        	$('#content').html(data);
+	        }
+	    });
+	      
+	    event.preventDefault();
+	  });
+	    
+});*/
+
+
 /*$('#searchAssignment').on("keypress", function(e) {
     if (e.keyCode == 13) {
         
@@ -37,13 +71,3 @@ function changePageAndSize() {
 	
 }*/
 
-
-$('.btn-filter').on('click', function () {
-    var $target = $(this).data('target');
-    if ($target != 'all') {
-      $('.table tr').css('display', 'none');
-      $('.table tr[data-status="' + $target + '"]').fadeIn('slow');
-    } else {
-      $('.table tr').css('display', 'none').fadeIn('slow');
-    }
-});
