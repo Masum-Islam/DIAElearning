@@ -91,7 +91,6 @@ public class GroupService implements IGroupService{
 				}	
     				
     			group.setGroupDetails(groupDetails);
-    			
     			groupRepository.save(Arrays.asList(group));
 				
 			}else {
@@ -159,6 +158,11 @@ public class GroupService implements IGroupService{
 		}
     	return false;
     }
+
+	@Override
+	public List<Group> findAllByUser(User user) {
+		return groupRepository.findAllByUser(user);
+	}
 	
 
 }

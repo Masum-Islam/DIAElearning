@@ -3,7 +3,6 @@ package info.dia.web.dto;
 public class SearchDTO {
 	
 	private String searchString;
-	
 	private Boolean assignmentStatus;
 
 	public String getSearchString() {

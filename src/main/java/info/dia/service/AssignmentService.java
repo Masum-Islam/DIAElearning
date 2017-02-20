@@ -1,11 +1,10 @@
 package info.dia.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -23,16 +22,16 @@ import com.mysema.query.BooleanBuilder;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
+import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.dao.GroupRepository;
 import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
-import info.dia.persistence.model.Group;
-import info.dia.persistence.model.GroupDetails;
 import info.dia.persistence.model.QAssignment;
 import info.dia.persistence.model.User;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
 import info.dia.web.dto.SearchDTO;
+import info.dia.web.error.AssignmentTitleAlreadyExistsByUserException;
 import info.dia.web.util.AssignmentMapper;
 
 @Service
@@ -52,23 +51,124 @@ public class AssignmentService implements IAssignmentService{
 	
 	@Autowired
 	private GroupRepository groupRepository;
+	
+	@Autowired
+	private AssignmentStudentRepository  assignmentStudentRepository;
+	
+	
+	@Autowired 
+    protected EmailService emailService;
 
 	@Override
 	public void saveAssignment(AssignmentDto assignmentDto) {
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
 		
-		
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
     		
     		User assignmentUser = userService.findUserByEmail(authentication.getName());
     		
     		if (assignmentDto.getId()!=0) {
-				
+    			
+    			Assignment assignment = assignmentRepository.findOne(assignmentDto.getId());
+    			
+    			List<User> sendEmailUserList = new ArrayList<User>();
+    			
+    			/*List<User> newEmailUserList = new ArrayList<User>();*/
+    			
+    			assignment.setTitle(assignmentDto.getTitle());
+    			assignment.setSession(assignmentDto.getSession());
+    			assignment.setInstructions(assignmentDto.getInstructions());
+    			assignment.setStatus(assignmentDto.getStatus());
+    			assignment.setUser(assignmentUser);
+    			assignment.setSubmitStartDate(assignmentDto.getSubmitStartDate());
+    			assignment.setSubmitEndDate(assignmentDto.getSubmitEndDate());
+    			
+    			Set<AssignmentStudent>  assignmentStudents= new HashSet<AssignmentStudent>();
+    			
+    			if (!StringUtils.isEmpty(assignmentDto.getEmailsTo())) {
+    				
+    				List<String> emailList = Arrays.asList(assignmentDto.getEmailsTo().split("\\s*,\\s*"));
+        			
+        			for (String email : emailList) {
+        				
+        				AssignmentStudent assignmentStudent = new AssignmentStudent();
+        				
+        				assignmentStudent.setAssignment(assignment);
+        				assignmentStudent.setEmail(email);
+        				
+        				User user = userService.findUserByEmail(email);
+						if (user!=null) {
+							sendEmailUserList.add(user);
+						}
+						
+        				assignmentStudent.setSubmitStartDate(assignmentDto.getSubmitStartDate());
+        				assignmentStudent.setSubmitEndDate(assignmentDto.getSubmitEndDate());
+        				
+        				AssignmentStudent student = assignmentStudentRepository.findByEmailAndAssignment(email, assignment);
+        				if (student!=null) {
+        					assignmentStudent.setId(student.getId());
+    					}
+        				assignmentStudents.add(assignmentStudent);
+    				}
+        			
+    			}
+    			
+    			Set<AssignmentStudent>  deletedAssignmentStudents= new HashSet<AssignmentStudent>();
+    			
+    			for (AssignmentStudent existsAssignmentStudent : assignment.getAssignmentStudents()) {
+    				
+    				boolean result = isObjectInSet(existsAssignmentStudent,assignmentStudents);
+    				/*LOGGER.info("Contains :"+existsAssignmentStudent.getEmail()+"--->"+result);*/
+    				if (!result) {
+    					AssignmentStudent deletedAssignmentStudent = assignmentStudentRepository.findByEmailAndAssignment(existsAssignmentStudent.getEmail(),assignment);
+    					/*LOGGER.info("deletedAssignmentStudent :"+deletedAssignmentStudent.getId()+"--->"+deletedAssignmentStudent.getEmail());*/
+    					deletedAssignmentStudents.add(deletedAssignmentStudent);
+					}
+				}
+    			
+    			/*LOGGER.info("Deleted AssignmentStudents Size :"+deletedAssignmentStudents.size());*/
+    			for (AssignmentStudent deletedAssignmentStudent : deletedAssignmentStudents) {
+    				assignmentStudentRepository.delete(deletedAssignmentStudent);
+				}
+    			
+    			// Sent email
+    			/*if (assignment.getStatus()==false && assignmentDto.getStatus()==true) {
+					emailService.sendAssignmentNotification(sendEmailUserList, assignmentDto,assignmentUser);
+				}else if (assignment.getStatus()==true) {
+					LOGGER.info("Assignment Status: "+assignmentDto.getStatus());
+					
+					for (AssignmentStudent assignmentStudent : assignmentStudents) {
+						
+	    				boolean result = isObjectInSet(assignmentStudent,assignment.getAssignmentStudents());
+	    				
+	    				if (!result) {
+							User newEmailuser = userService.findUserByEmail(assignmentStudent.getEmail());
+							LOGGER.info("Newly sent email user :"+newEmailuser.getEmail()+"--->"+result);
+							if (newEmailuser!=null) {
+								newEmailUserList.add(newEmailuser);
+							}
+						}
+	    				
+					}
+					
+					if (newEmailUserList.size()>0) {
+						LOGGER.info("New Entry Email size :"+newEmailUserList.size());
+						emailService.sendAssignmentNotification(newEmailUserList,assignmentDto,assignmentUser);
+					}
+				}*/
+    			
+    			assignment.setAssignmentStudents(assignmentStudents);
+    			assignmentRepository.save(Arrays.asList(assignment));
+    			
 			}else {
 				
-				Assignment assignment = new Assignment();
+				if (assignmentTitleByUserExist(assignmentUser, assignmentDto.getTitle())) {
+					throw new AssignmentTitleAlreadyExistsByUserException("Assignment title already exists with "+assignmentUser.getEmail());
+				}
 				
+				
+				Assignment assignment = new Assignment();
 				
 				assignment.setTitle(assignmentDto.getTitle());
 				assignment.setSession(assignmentDto.getSession());
@@ -77,57 +177,41 @@ public class AssignmentService implements IAssignmentService{
 				assignment.setInstructions(assignmentDto.getInstructions());
 				assignment.setCreateDate(new Date());
 				assignment.setUser(assignmentUser);
+				assignment.setStatus(assignmentDto.getStatus());
+				
+				List<User> sendEmailUserList = new ArrayList<User>();
+				
 				
 				Set<AssignmentStudent> assignmentEmails = new HashSet<AssignmentStudent>();
 				
-				//For duplicate email
-				HashMap<String,Long> emails = new HashMap<String,Long>();
-				
-				/*if (assignmentDto.getEmails()!=null) {
+				if (!StringUtils.isEmpty(assignmentDto.getEmailsTo())) {
 					
-					for (Group group : assignmentDto.getEmails()) {
-						
-						if (group.getGroupDetails()!=null) {
-							for (GroupDetails groupDetails : group.getGroupDetails()) {
-								emails.put(groupDetails.getEmail(),group.getId());
-							}
-						}
-					}
-				}*/
-				
-				if (assignmentDto.getEmails()!=null) {
-					for (GroupDetails groupDetails : assignmentDto.getEmails()) {
-						LOGGER.info("Before Email :"+groupDetails.getEmail()+"--->Group Id :"+groupDetails.getGroup().getId());
-						emails.put(groupDetails.getEmail(),groupDetails.getGroup().getId());
-					}
-				}
-				
-				LOGGER.info("Total Email Size:"+emails.size());
-				
-				if (emails.size()>0) {
-					for (Map.Entry<String, Long> entry : emails.entrySet()) {
+					List<String> emailList = Arrays.asList(assignmentDto.getEmailsTo().split("\\s*,\\s*"));
+					
+					for (String email : emailList) {
 						
 						AssignmentStudent assignmentStudent = new AssignmentStudent();
 						
-						LOGGER.info("After Email :"+entry.getKey()+"--->Group Id :"+entry.getValue());
-						
-						Group group = groupRepository.findOne(entry.getValue());
+						User user = userService.findUserByEmail(email);
+						if (user!=null) {
+							sendEmailUserList.add(user);
+						}
 						
 						assignmentStudent.setAssignment(assignment);
-						assignmentStudent.setGroup(group);
-						assignmentStudent.setEmail(entry.getKey());
+						assignmentStudent.setEmail(email);
 						assignmentStudent.setSubmitStartDate(assignmentDto.getSubmitStartDate());
 						assignmentStudent.setSubmitEndDate(assignmentDto.getSubmitEndDate());
 						
 						assignmentEmails.add(assignmentStudent);
-						
 					}
 				}
-				
-				
 				assignment.setAssignmentStudents(assignmentEmails);
-				
 				assignmentRepository.save(Arrays.asList(assignment));
+				
+				// Sent email
+				/*if (assignmentDto.getStatus()==true) {
+					emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);
+				}*/
 			}
     	}
 		
@@ -157,11 +241,11 @@ public class AssignmentService implements IAssignmentService{
 
 
 		
-	boolean isObjectInSet(GroupDetails object, Set<GroupDetails> set) {
+	boolean isObjectInSet(AssignmentStudent object, Set<AssignmentStudent> set) {
 		
 		   boolean result = false;
 
-		   for(GroupDetails o : set) {
+		   for(AssignmentStudent o : set) {
 		     if(o.getEmail().equalsIgnoreCase(object.getEmail())) {
 		       result = true;
 		       break;
@@ -193,20 +277,20 @@ public class AssignmentService implements IAssignmentService{
 						.or(qAssignment.session.containsIgnoreCase(searchDTO.getSearchString()))
 						.or(qAssignment.status.eq(searchDTO.getAssignmentStatus()))
 						.and(qAssignment.user.id.eq(user.getId())));
-				LOGGER.info(" String and Boolean.............");
+				/*LOGGER.info(" String and Boolean.............");*/
 			}else if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
 				b = b.and(qAssignment.title.containsIgnoreCase(searchDTO.getSearchString())
 						.or(qAssignment.session.containsIgnoreCase(searchDTO.getSearchString()))
 						.and(qAssignment.user.id.eq(user.getId())));
-				LOGGER.info("String.............");
+				/*LOGGER.info("String.............");*/
 			}else if (searchDTO.getAssignmentStatus()!=null) {
 				b = b.and(qAssignment.status.eq(searchDTO.getAssignmentStatus()))
 						.and(qAssignment.user.id.eq(user.getId()));
 				
-				LOGGER.info("Boolean.............");
+				/*LOGGER.info("Boolean.............");*/
 				
 			}else {
-				LOGGER.info("Nothing.............");
+				/*LOGGER.info("Nothing.............");*/
 				b = b.and(qAssignment.user.id.eq(user.getId()));
 			}
 		}
@@ -214,5 +298,33 @@ public class AssignmentService implements IAssignmentService{
 		LOGGER.info("user email :"+user.getEmail()+" Search Find :"+assignmentRepository.findAll(b, p).getTotalElements());
 		
 		return assignmentRepository.findAll(b, p);
+	}
+	
+	private boolean emailExist(final String email) {
+        final User user = userService.findUserByEmail(email);
+        if (user != null) {
+            return true;
+        }
+        return false;
+    }
+	
+	private boolean assignmentTitleByUserExist(User user,final String title){
+    	final Assignment assignment = assignmentRepository.findByUserAndTitleIgnoreCase(user, title);
+    	if (assignment!=null) {
+			return true;
+		}
+    	return false;
+    }
+
+
+	@Override
+	public Assignment getAssignmentByIdAndUser(long id, long userId) {
+		return assignmentRepository.findByIdAndUserId(id, userId);
+	}
+
+
+	@Override
+	public Assignment findByUserAndTitleIgnoreCase(User user, String title) {
+		return assignmentRepository.findByUserAndTitleIgnoreCase(user, title);
 	}
 }

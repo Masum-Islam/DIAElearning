@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" layout:decorator="layouts/main">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{label.pages.teacher.viewAssignment}">Title</title>
+</head>
+<body>
+
+	<th:block layout:fragment="script">
+		<link th:href="@{/assets/css/tableResponsive.css}" rel="stylesheet" type="text/css" />
+		
+		<script>
+			
+			$('#th_Checkbox').click(
+					function(e) {
+						$(this).closest('table').find('td input:checkbox').prop('checked', this.checked);
+			});
+		</script>
+		
+		
+	</th:block>
+
+	<div layout:fragment="content">
+
+		<div class="page-content-inner">
+			<div class="row">
+				<!-- BEGIN SAMPLE FORM PORTLET-->
+				<!-- <form id="viewAssignmentForm" th:object="${assignment}"> -->
+					<div class="portlet light ">
+						<div class="portlet-title">
+						
+							<div class="caption font-blue-sharp col-md-3">
+								<i class="fa fa-sticky-note-o font-red-sunglo" data-toggle="tooltip" data-placement="top" title="Assignment Name"></i> <span
+									class="caption-subject bold" th:text="${assignment.title}">View
+									Assignment</span>
+							</div>
+
+							<div class="caption font-blue-sharp col-md-2" data-toggle="tooltip" data-placement="top" title="Last Date Of Submission">
+								<span class="fa fa-calendar-o font-red-sunglo "></span> <span
+									class="caption-subject bold"
+									th:text="${assignment.submitEndDate} ? ${#calendars.format(assignment.submitEndDate,'dd MMM yyyy hh:mm a')}">Assignment
+									Date Information</span>
+							</div>
+							
+							<div class="caption font-blue-sharp col-md-2" style="padding-left: 2%;" data-toggle="tooltip" data-placement="top" title="Assignment Session">
+								<span class="font-red-sunglo bold">Session :</span> <span
+									class="caption-subject bold"
+									th:text="${assignment.session}">Assignment Session</span>
+							</div>
+							
+							<div class="caption font-blue-sharp col-md-2" style="padding-left: 2%;" data-toggle="tooltip" data-placement="top" title="Assignment Status">
+								<span class="font-red-sunglo bold">Status :</span> <span
+									class="caption-subject bold"
+									th:text="${assignment.status==true?'Published':'Saved'}">Assignment Status</span>
+							</div>
+							
+							<div class="caption font-blue-sharp col-md-1" style="padding-left: 3%;" data-toggle="tooltip" data-placement="top" title="Total Number Of Students">
+								<i class="fa fa-users font-red-sunglo "></i> <span
+									class="caption-subject bold"
+									th:text="${totalAssignmentStudents}">Total Number Of Students</span>
+							</div>
+							
+							<div class="caption font-blue-sharp col-md-1" data-toggle="tooltip" data-placement="top" title="Submitted">
+								<i class="fa fa-upload font-red-sunglo "></i> <span
+									class="caption-subject bold"
+									th:text="${totalAssignmentSubmittedStudents}">Submitted</span>
+							</div>
+							
+							<div class="actions col-md-1">
+								<div class="btn-group">
+									<a class="btn btn-sm green btn-outline dropdown-toggle"
+										href="javascript:;" data-toggle="dropdown"> Actions <i
+										class="fa fa-angle-down"></i>
+									</a>
+									<ul class="dropdown-menu pull-right">
+										<li><a th:href="@{/teacher/assignment}"><i
+												class="fa fa-plus-circle"></i>Create Assignment</a></li>
+										<li><a th:href="@{/teacher/assignments}"> <i
+												class="fa fa-eye"></i>View Assignments
+										</a></li>
+									</ul>
+								</div>
+							</div>
+							
+						</div>
+						
+						<th:block th:include="fragments/searchAssignmentStudent :: searchAssignmentStudent"></th:block>
+						
+						<div id="no-more-tables" class="portlet-body form">
+
+							<table id="allAssignmentTable" class="col-md-12 table-bordered table-striped table-condensed cf">
+
+								<thead class="cf">
+									<tr>
+										<th><input type="checkbox"  id="th_Checkbox" /></th>
+										<th>Email</th>
+										<th>
+										<span data-toggle="tooltip" data-placement="top" title="Assignment Status" class="glyphicon glyphicon-stats"></span>
+										</th>
+										<th width="29%">
+										<span data-toggle="tooltip" data-placement="top" title="Submitted Date" class="glyphicon glyphicon-time"></span>
+										</th>
+										<th>
+										<span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span>
+										</th>
+										<!-- <th>Time Remains</th> -->
+										<th width="12%">
+										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
+										</th>
+									</tr>
+								</thead>
+								<tbody th:if="${not #lists.isEmpty(assignmentStudentInfos)}">
+									<tr th:each="assignmentStudentInfo,rowStat : ${assignmentStudentInfos}">
+										<!-- <td th:text="${rowStat.count}">1</td> -->
+										<td><input type="checkbox"  id="td_Checkbox" /></td>
+										<td data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
+										
+										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == true">Submitted</td>
+										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == false">Not Submitted</td>
+										
+										<td data-title="Submitted Date" th:text="${assignmentStudentInfo.submitedDate} ? ${#calendars.format(assignmentStudentInfo.submitedDate,'dd MMM yyyy hh:mm a')}">Submitted Date</td>
+										
+										<td data-title="Last Date Of Submission" th:text="${assignmentStudentInfo.lastDateOfSubmission} ? ${#calendars.format(assignmentStudentInfo.lastDateOfSubmission,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
+										
+										
+										
+
+										<!-- <td>Time Remains</td> -->
+										<td data-title="Actions" >
+											<a class="btn btn-icon-only green" data-toggle="tooltip" data-placement="top" title="Edit"  href="#"><span class="glyphicon glyphicon-pencil"></span></a>
+											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download" href="#"><span class="fa fa-download"></span></a>
+											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+										</td>
+									</tr>
+								</tbody>
+								
+								<tbody th:if="${#lists.isEmpty(assignmentStudentInfos)}">
+									<tr>
+										<td class="alert alert-warning" align="center" colspan="6">No Assignment Student Found!</td>
+									</tr>
+								</tbody>
+							</table>
+
+						<div th:if="${isSearch}=='true'">
+							
+							<div class="row">
+							<div th:if="${assignmentStudents.getTotalPages() > 0}">
+								<div th:if="${assignmentStudents.getTotalPages() > 1}"
+									class="form-group col-sm-12 col-md-12 col-lg-12 pagination-centered">
+									<ul class="pagination">
+										<li th:class="${assignmentStudents.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{'/teacher/assignmentStudents/search/'+${assignment.id}( page=1,oldDirection=${oldDirection},oldSortString=${oldSortString})}">&laquo;</a></li>
+										<li th:class="${assignmentStudents.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{'/teacher/assignmentStudents/search/'+${assignment.id}( page=${assignmentStudents.getNumber()},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&larr;</a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() == (page - 1)} ? 'active pointer-disabled'"
+											th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}"><a
+											class="pageLink"
+											th:href="@{'/teacher/assignmentStudents/search/'+${assignment.id}( page=${page},oldDirection=${oldDirection},oldSortString=${oldSortString})}"
+											th:text="${page}"></a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() + 1 == assignmentStudents.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{'/teacher/assignmentStudents/search/'+${assignment.id}( page=${assignmentStudents.getNumber() + 2},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&rarr;</a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() + 1 == assignmentStudents.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{'/teacher/assignmentStudents/search/'+${assignment.id}(page=${assignmentStudents.getTotalPages()})}">&raquo;</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						
+						</div>
+
+						<div th:if="${isSearch==null}">
+							
+						<div class="row">
+							<div th:if="${assignmentStudents.getTotalPages() > 0}">
+								<div th:if="${assignmentStudents.getTotalPages() > 1}"
+									class="form-group col-sm-12 col-md-12 col-lg-12 pagination-centered">
+									<ul class="pagination">
+										<li th:class="${assignmentStudents.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/viewAssignment/(assignmentId=${assignment.id},page=1,oldDirection=${oldDirection},oldSortString=${oldSortString})}">&laquo;</a></li>
+										<li th:class="${assignmentStudents.getNumber() == 0} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/viewAssignment/(assignmentId=${assignment.id},page=${assignmentStudents.getNumber()},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&larr;</a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() == (page - 1)} ? 'active pointer-disabled'"
+											th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}"><a
+											class="pageLink"
+											th:href="@{/teacher/viewAssignment/(assignmentId=${assignment.id},page=${page},oldDirection=${oldDirection},oldSortString=${oldSortString})}"
+											th:text="${page}"></a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() + 1 == assignmentStudents.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/viewAssignment/(assignmentId=${assignment.id},page=${assignmentStudents.getNumber() + 2},oldDirection=${oldDirection},oldSortString=${oldSortString})}">&rarr;</a></li>
+										<li
+											th:class="${assignmentStudents.getNumber() + 1 == assignmentStudents.getTotalPages()} ? disabled"><a
+											class="pageLink"
+											th:href="@{/teacher/viewAssignment/(assignmentId=${assignment.id},page=${assignmentStudents.getTotalPages()})}">&raquo;</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+						
+					</div>
+				<!-- </form> -->
+			</div>
+		</div>
+
+	</div>
+
+</body>
+</html>

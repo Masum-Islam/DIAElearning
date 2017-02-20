@@ -1,5 +1,8 @@
 package info.dia.service;
 
+import java.util.List;
+import java.util.Locale;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -11,7 +14,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import info.dia.persistence.model.User;
+import info.dia.web.dto.AssignmentDto;
 
 
 @Component
@@ -27,11 +36,14 @@ public class EmailService {
     
     private static final String PNG_MIME = "image/png";
 	
-	 @Autowired
-	 private JavaMailSender mailSender;
+	@Autowired
+	private JavaMailSender mailSender;
 	 
-	 @Autowired
-	 private Environment env;
+	@Autowired
+	private Environment env;
+	 
+	@Autowired 
+	private TemplateEngine templateEngine;
 	 
 	 
 	 public void sendEmail(String to, String subject, String content)
@@ -63,5 +75,46 @@ public class EmailService {
 			}
 		}
 	 
-	
+	 
+	 public void sendAssignmentNotification(final List<User> users, final AssignmentDto assignmentDto,User assignmentUser) 
+     {
+         MimeMessagePreparator[] preparators = new MimeMessagePreparator[users.size()];
+         int i = 0;
+         for (final User user: users) 
+         {
+             preparators[i++] =  new MimeMessagePreparator() 
+             {
+                 public void prepare(MimeMessage mimeMessage) throws Exception 
+                 {
+                     final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                     message.setSubject("New assignment has been created:#"+assignmentDto.getTitle());
+                     message.setTo(user.getEmail());
+                     message.setFrom(env.getProperty("support.email"));
+                     
+                     final Locale locale = new Locale(Locale.ENGLISH.toString());
+                     
+                     final Context ctx = new Context(locale);
+                     ctx.setVariable("assignmentCreator", assignmentUser.getFirstName()+" "+assignmentUser.getLastName());
+                     ctx.setVariable("name", user.getFirstName()+" "+user.getLastName());
+                     ctx.setVariable("title", assignmentDto.getTitle());
+                     ctx.setVariable("session", assignmentDto.getSession());
+                     ctx.setVariable("startDate", assignmentDto.getSubmitStartDate());
+                     ctx.setVariable("endDate", assignmentDto.getSubmitEndDate());
+                     
+                     
+                     final String htmlContent = templateEngine.process("assignmentInformationEmail",ctx);
+                     
+                    message.setText(htmlContent, true /* isHtml */);
+                     
+                    message.addInline("background", new ClassPathResource(BACKGROUND_IMAGE), PNG_MIME);
+     	            message.addInline("logo-background", new ClassPathResource(LOGO_BACKGROUND_IMAGE), PNG_MIME);
+     	            message.addInline("thymeleaf-banner", new ClassPathResource(THYMELEAF_BANNER_IMAGE), PNG_MIME);
+     	            message.addInline("thymeleaf-logo", new ClassPathResource(THYMELEAF_LOGO_IMAGE), PNG_MIME);
+     	            
+                 }
+             };
+         }
+         mailSender.send(preparators);
+     }
+
 }

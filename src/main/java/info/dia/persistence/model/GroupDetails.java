@@ -25,7 +25,6 @@ public class GroupDetails {
 		
 	}
 	
-	
 
 	public GroupDetails(String email) {
 		super();
@@ -72,11 +71,5 @@ public class GroupDetails {
 	public void setGroup(Group group) {
 		this.group = group;
 	}
-
-	
-	
-	
-	
-
 
 }

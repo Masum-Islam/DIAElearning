@@ -25,6 +25,21 @@ function changePageAndSize() {
 	});
 });*/
 
+
+    
+
+/*$("input:radio").on("click",function (e) {
+	alert("clicked");
+    var inp=$(this); //cache the selector
+    console.log(inp);
+    if (inp.is(".active")) { //see if it has the selected class
+        inp.prop("checked",false).removeClass("active");
+        return;
+    }
+    $("input:radio[name='"+inp.prop("name")+"'].active").removeClass("active");
+    inp.addClass("active");
+});*/
+
 /*$(document).ready(function() {
 	   
 	  $('#searchForm').submit(function(event) {

@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -33,17 +34,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
 import info.dia.persistence.model.Assignment;
+import info.dia.persistence.model.AssignmentStudent;
 import info.dia.persistence.model.Group;
 import info.dia.persistence.model.GroupDetails;
 import info.dia.persistence.model.User;
 import info.dia.service.IAssignmentService;
+import info.dia.service.IAssignmentStudentService;
+import info.dia.service.IGroupDetailsService;
 import info.dia.service.IGroupService;
 import info.dia.service.IUserService;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
+import info.dia.web.dto.AssignmentStudentInfo;
+import info.dia.web.dto.EmailsDto;
 import info.dia.web.dto.GroupDto;
 import info.dia.web.dto.SearchDTO;
 import info.dia.web.util.AssignmentMapper;
+import info.dia.web.util.AssignmentStudentMapper;
 import info.dia.web.util.GenericResponse;
 import info.dia.web.util.HelperUtils;
 
@@ -64,6 +71,9 @@ public class TeacherController {
 	private IGroupService groupService;
 	
 	@Autowired
+	private IGroupDetailsService groupDetailsService;
+		
+	@Autowired
     private IAuthenticationFacade authenticationFacade;
 	
 	@Autowired
@@ -71,6 +81,10 @@ public class TeacherController {
 	
 	@Autowired 
 	private AssignmentRepository assignmentRepository;
+	
+	
+	@Autowired
+	private IAssignmentStudentService assignmentStudentService;
 	
 	
 	private static final int BUTTONS_TO_SHOW = 5;
@@ -89,33 +103,26 @@ public class TeacherController {
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
-    		
-    		User user = userService.findUserByEmail(authentication.getName());
-    		
-    		List<Group> groups = groupService.findByUser(user);
-    		
-    		
-    		model.addAttribute("assignment",new AssignmentDto());
-    		model.addAttribute("emails",groups);
-    		
-    		
+    		String roleName = "ROLE_USER";
+    		LOGGER.info("User List size:"+userService.findByRoles(roleName));
+    		model.addAttribute("assignmentDto",new AssignmentDto());
+    		model.addAttribute("emailsFrom",userService.findByRoles(roleName));
     	}
 		return "teacher/assignment";
 	}
 	/*End Assignment Page Method*/
 	
+	
+	
 	/*Start Assignment Save/Update Method*/
-	@RequestMapping(value="/assignment",params="save",method=RequestMethod.POST)
+	@RequestMapping(value="/assignment",method=RequestMethod.POST)
 	@ResponseBody
 	public GenericResponse saveAssignment(final Locale locale,@Valid AssignmentDto assignmentDto,@RequestParam Map<String,String> reqPar){
 		
  		String submitStartDate = reqPar.get("submitStartDate");
  		String submitEndDate = reqPar.get("submitEndDate");
  		
- 		LOGGER.info("Date Value :"+submitStartDate+"--->"+submitEndDate);
- 		
  		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
- 		
  		
 			Date pStartDate = null;
 			Date pEndDate = null;
@@ -127,47 +134,21 @@ public class TeacherController {
 				e.printStackTrace();
 			}
 			
-			
 			Calendar c1 = Calendar.getInstance();
 			c1.setTime(pStartDate);
 			
 			Calendar c2 = Calendar.getInstance();
 			c2.setTime(pEndDate);
 			
-			LOGGER.info("After Parse :"+"Start Date :"+pStartDate+ " End Date :"+pEndDate);
-			
 			assignmentDto.setSubmitStartDate(c1.getTime());
 			assignmentDto.setSubmitEndDate(c2.getTime());
 			
-		    // user clicked "Save Button"
-			LOGGER.info("Save Button Clicked");
-			
-			//Assignment status--->0(save) and status--->1(save and published)
-			
 			assignmentService.saveAssignment(assignmentDto);
-		
 		
 		
     	return new GenericResponse(messages.getMessage("message.assignmentSaveSuc", null, locale));
 	}
 	/*End Assignment Save/Update Method*/
-	
-	
-	
-	/*Start Assignment Save/Update with published Method*/
-	@RequestMapping(value="/assignment",params="published",method=RequestMethod.POST)
-	@ResponseBody
-	public GenericResponse saveAndPublishedAssignment(final Locale locale,@Valid AssignmentDto assignmentDto,@RequestParam Map<String,String> reqPar){
-	
-		    // user clicked "Save And Published Button"
-			LOGGER.info("Save And Published Button Clicked :");
-			
-			//Assignment status--->0(save) and status--->1(save and published)
-		
-    	return new GenericResponse(messages.getMessage("message.assignmentPublishedSuc", null, locale));
-	}
-	/*End Assignment Save/Update Method*/
-	
 	
 	
 	@RequestMapping(value="/assignments", method=RequestMethod.GET)
@@ -248,56 +229,191 @@ public class TeacherController {
     		model.addAttribute("isSearch", "true");
     		session.setAttribute("searchDTO", searchDTO);
     		
-    		LOGGER.info("Search String:"+searchDTO.getSearchString()+" and boolean value: "+searchDTO.getAssignmentStatus());
+    		/*LOGGER.info("Search String:"+searchDTO.getSearchString()+" and boolean value: "+searchDTO.getAssignmentStatus());*/
     		
     	}
     	
     	return "/teacher/assignmentList";
 	}
-
-	/**
-	 * Handles all requests
-	 * 
-	 * @param pageSize
-	 * @param page
-	 * @return model and view
-	 */
 	
-	/*@RequestMapping(value="/getAssignmentList", method=RequestMethod.GET)
-	public String allAssignmentInformationByUser(Model model,@RequestParam(value = "pageSize", required = false) Integer pageSize,
-												 @RequestParam(value = "page", required = false) Integer page){
-		
-		// Evaluate page size. If requested parameter is null, return initial
-		// page size
-		int evalPageSize = pageSize == null ? INITIAL_PAGE_SIZE : pageSize;
-		
-		// Evaluate page. If requested parameter is null or less than 0 (to
-		// prevent exception), return initial size. Otherwise, return value of
-		// param. decreased by 1.
-		int evalPage = (page == null || page < 1) ? INITIAL_PAGE : page - 1;
+	@RequestMapping(value="/assignment/{id}",method=RequestMethod.GET)
+	public String editAssignment(Model model,@PathVariable("id") long id){
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
+		String viewPage = "";
+		
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			
+    		User currentUser = userService.findUserByEmail(authentication.getName());
+    		
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(id, currentUser.getId());
+    		
+    		LOGGER.info("Assignment Edit User:"+currentUser.getEmail()+"--->Assignment Id"+id+"---->Assignment :"+assignment);
+    		
+    		if (assignment!=null) {
+    			
+    			AssignmentDto assignmentDto = new AssignmentDto();
+				
+    			assignmentDto.setId(assignment.getId());
+    			assignmentDto.setTitle(assignment.getTitle());
+    			assignmentDto.setSession(assignment.getSession());
+    			assignment.setCreateDate(assignment.getCreateDate());
+    			assignmentDto.setSubmitStartDate(assignment.getSubmitStartDate());
+    			assignmentDto.setSubmitEndDate(assignment.getSubmitEndDate());
+    			assignmentDto.setInstructions(assignment.getInstructions());
+    			assignmentDto.setStatus(assignment.getStatus());
+    			StringJoiner joiner = new StringJoiner(",");
+    			
+    			for (AssignmentStudent assignmentStudent : assignment.getAssignmentStudents()) {
+    				joiner.add(assignmentStudent.getEmail());
+				}
+    			assignmentDto.setEmailsTo(joiner.toString());
+				
+				model.addAttribute("assignmentDto", assignmentDto);
+				
+				viewPage = "teacher/assignment";
+			}else{
+				
+				viewPage = "error/404";
+				
+			}
+    		
+		}
+		
+		return viewPage;
+	}
+	
+	@RequestMapping(value="/viewAssignment/")
+	public String viewAssignment(Model model,
+			@RequestParam(value = "assignmentId", required = true) Long assignmentId,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection){
+		
+		Authentication authentication = authenticationFacade.getAuthentication();
+		
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			
+    		User currentUser = userService.findUserByEmail(authentication.getName());
+    		
+    		/*LOGGER.info("Assignment Id:"+assignmentId);*/
+    		
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId,currentUser.getId());
+    		
+    		PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+    		
+    		Page<AssignmentStudent> assignmentStudents = assignmentStudentService.findAllByAssignment(assignment,pageRequest);
+    		List<AssignmentStudentInfo> assignmentStudentInfos = AssignmentStudentMapper.map(assignmentStudents);
+    		
+    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignmentStudents.getTotalPages(),assignmentStudents.getNumber(),BUTTONS_TO_SHOW);
+    		
+    		int totalAssignmentSubmittedStudents = assignmentSubmittedCount(assignmentStudentInfos);
+    		
+    		model.addAttribute("assignment", assignment);
+    		model.addAttribute("assignmentStudents", assignmentStudents);
+    		model.addAttribute("totalAssignmentStudents", assignmentStudents.getTotalElements());
+    		model.addAttribute("totalAssignmentSubmittedStudents",totalAssignmentSubmittedStudents);
+    		model.addAttribute("assignmentStudentInfos", assignmentStudentInfos);
+    		model.addAttribute("pager", pager);
+    		model.addAttribute("searchDTO", new SearchDTO());
+    		
+		}
+		
+		
+		return "/teacher/viewAssignment";
+	}
+	
+	
+	@RequestMapping(value = "/assignmentStudents/search/{assignmentId}",method=RequestMethod.GET)
+	public String searchAssignmentStudent(
+			Model model,
+			HttpSession session,
+			/*@RequestParam(value = "assignmentId", required = true) Long assignmentId,*/
+			@PathVariable("assignmentId") long assignmentId,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection,
+			@ModelAttribute("searchDTO") SearchDTO searchDTO) {
+		
+		
+		LOGGER.info("Assignment Id :"+assignmentId);
+		
+		/*LOGGER.info("Search Method Called!"+" with search string :"+searchDTO.getSearchString()+" and boolean value:"+searchDTO.getAssignmentStatus());*/
+		
+		SearchDTO sessionSearchDTO = (SearchDTO) session.getAttribute("searchDTO");
+		
+		if (sessionSearchDTO != null && page != null) {
+			searchDTO = sessionSearchDTO;
+		}
+		
+		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		
+		
+		
+		return searchAssignmentStudent(model, session,assignmentId,searchDTO, pageRequest);
+	}
+	
+	
+	public String searchAssignmentStudent(Model model, HttpSession session,Long assignmentId,SearchDTO searchDTO,PageRequest pageRequest){
+		
+		Authentication authentication = authenticationFacade.getAuthentication();
+		
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
     		
     		User user = userService.findUserByEmail(authentication.getName());
     		
-    		Page<Assignment> assignments = assignmentRepository.findByUser(user,new PageRequest(evalPage, evalPageSize,Sort.Direction.DESC,"submitStartDate"));
-    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId,user.getId());
     		
-    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignments.getTotalPages(),assignments.getNumber(),BUTTONS_TO_SHOW);
+    		Page<AssignmentStudent> assignmentStudents = assignmentStudentService.searchAssignmentStudent(assignment,searchDTO,pageRequest);
     		
-    		model.addAttribute("assignmentInfoDtos", assignmentInfoDtos);
-    		model.addAttribute("assignments", assignments);
-    		model.addAttribute("selectedPageSize", evalPageSize);
-    		model.addAttribute("pageSizes", PAGE_SIZES);
+    		List<AssignmentStudentInfo> assignmentStudentInfos = AssignmentStudentMapper.map(assignmentStudents);
+    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignmentStudents.getTotalPages(),assignmentStudents.getNumber(),BUTTONS_TO_SHOW);
+    		
+    		int totalAssignmentSubmittedStudents = assignmentSubmittedCount(assignmentStudentInfos);
+    		
+    		
+    		model.addAttribute("assignment", assignment);
+    		model.addAttribute("assignmentStudents", assignmentStudents);
+    		model.addAttribute("totalAssignmentStudents", assignmentStudents.getTotalElements());
+    		model.addAttribute("totalAssignmentSubmittedStudents",totalAssignmentSubmittedStudents);
+    		model.addAttribute("assignmentStudentInfos", assignmentStudentInfos);
     		model.addAttribute("pager", pager);
+    		model.addAttribute("searchDTO", searchDTO != null ? searchDTO: new AssignmentStudent());
+    		model.addAttribute("isSearch", "true");
+    		session.setAttribute("searchDTO", searchDTO);
+    		
+    		/*LOGGER.info("Assignment student search string:"+searchDTO.getSearchString()+" and boolean value: "+searchDTO.getAssignmentStatus());*/
+    		
     	}
+    	
+    	return "/teacher/viewAssignment";
+	}
+	
+	
 
-    	return "/teacher/assignments :: assignments";
-	}*/
 	
-	
-	
+	@RequestMapping(value="/assignmentEmail.json/{query}",method=RequestMethod.GET)
+	@ResponseBody
+	public List<EmailsDto> getAssignmentEmails(@PathVariable("query") String query){
+		
+		List<EmailsDto> emails = new ArrayList<>();
+		LOGGER.info("query String :"+query);
+		
+		Iterable<User> iterable = userService.searchEmail(query);
+		List<User> users = new ArrayList<>();
+		iterable.iterator().forEachRemaining(users::add);
+		
+		for (User user : users) {
+			EmailsDto dto = new EmailsDto();
+			dto.setEmail(user.getEmail());
+			dto.setName(user.getFirstName()+" "+user.getLastName());
+			emails.add(dto);
+		}
+		
+		return emails;
+	}	
 	/* End Assignment Related Methods*/
 	
 	
@@ -415,6 +531,19 @@ public class TeacherController {
    	}
     
     
+    public int assignmentSubmittedCount(List<AssignmentStudentInfo> assignmentStudents){
+    	
+    	int count=0;
+    	
+    	for (AssignmentStudentInfo assignmentStudentInfo : assignmentStudents) {
+			if (assignmentStudentInfo.getStatus()==true) {
+				count +=count;
+			}
+		}
+    	 return count;
+    }
+    
+   
 	
 
 }

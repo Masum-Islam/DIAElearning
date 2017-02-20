@@ -3,6 +3,8 @@ package info.dia.config;
 import java.util.Locale;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.ErrorPage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +33,8 @@ import info.dia.validation.PasswordMatchesValidator;
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	public static final String ENCODING = "UTF-8";
+	
+	
 	
     public MvcConfig() {
         super();
@@ -138,8 +142,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public RequestContextListener requestContextListener() {
         return new RequestContextListener();
     }
-    
-
     
 
 }

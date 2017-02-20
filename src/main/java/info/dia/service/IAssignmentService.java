@@ -21,4 +21,9 @@ public interface IAssignmentService {
 	List<AssignmentInfoDto> findByStatus(User user,boolean status,Pageable pageable);
 	
 	Page<Assignment> searchRequests(User user,SearchDTO searchDTO, Pageable p);
+	
+	Assignment getAssignmentByIdAndUser(long id,long userId);
+	
+	Assignment findByUserAndTitleIgnoreCase(User user,String title);
+	
 }

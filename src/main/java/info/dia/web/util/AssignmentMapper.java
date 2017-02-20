@@ -24,7 +24,7 @@ public class AssignmentMapper {
         infoDto.setSubmitStartDate(assignment.getSubmitStartDate());
         infoDto.setSubmitEndDate(assignment.getSubmitEndDate());
         infoDto.setEmails(assignment.getAssignmentStudents());
-        infoDto.setStatus(assignment.isStatus());
+        infoDto.setStatus(assignment.getStatus());
 
         if (assignment.getAssignmentStudents().size()>0){
             infoDto.setTotalNumberOfStudent(assignment.getAssignmentStudents().size());

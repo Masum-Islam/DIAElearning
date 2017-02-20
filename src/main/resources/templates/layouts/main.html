@@ -13,7 +13,9 @@
         <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/scrolling-nav.css}" rel="stylesheet">
         <link th:href="@{/assets/css/style.css}" rel="stylesheet" type="text/css" />
+        
         <link th:href="@{/assets/css/animate.css}" rel="stylesheet" type="text/css" />
+        
         <link th:href="@{/assets/css/dropzone.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/profile.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/bootstrap-datetimepicker.min.css}" rel="stylesheet" type="text/css" />
@@ -229,15 +231,12 @@
 
     <script th:src="@{/assets/js/jquery.min.js}" type="text/javascript"></script>
     <script th:src="@{/assets/js/bootstrap.min.js}" type="text/javascript"></script>
+    <script th:src="@{/assets/js/moment.min.js}"></script>
     <!-- <script th:src="@{/assets/js/navberTransition.js}" type="text/javascript"></script> -->
     <script th:src="@{/assets/js/bootstrap-datetimepicker.js}"></script>
     <script th:src="@{/assets/js/dropzone.js}" type="text/javascript"></script>
 	<script th:src="@{/assets/js/pwstrength.js}"></script>
     <script th:src="@{/assets/js/bootstrap-notify.min.js}"></script>
-    
-    
-    
-    
     
     <script th:src="@{/assets/js/bootstrap-hover-dropdown.min.js}"></script>
     <script th:src="@{/assets/js/scrolling-nav.js}"></script>
@@ -288,14 +287,12 @@ $(function () {
 } */
 
 
-
-
 function retrieveGroupUsers() {
 		 var url = serverContext + 'teacher/groups';
-		    if ($('#search').val() != '') {
-		        url = url + '/' + $('#search').val();
-		    }
-		    $("#resultsBlock").load(url);
+		 if ($('#search').val() != '') {
+		    url = url + '/' + $('#search').val();
+		 }
+		 $("#resultsBlock").load(url);
 }
 
 
@@ -311,12 +308,11 @@ function retrieveGroupUsers() {
 	    }
 } */
 
-
-/* function editGroup(){
+function editGroup(){
 	
 	var url = serverContext + 'teacher/editGroups';
 	
-	alert($('#search').val() );
+	/* alert($('#search').val() ); */
 	
 	if ($('#search').val() != '') {
         url = url + '/' + $('#search').val();
@@ -330,7 +326,7 @@ function retrieveGroupUsers() {
     	errorMsg("Please select group");
         
     });
-} */
+}
 
 /* $('.selectpicker').selectpicker({
 	  style: 'btn-info',
@@ -501,12 +497,12 @@ $(document).ready(function () {
 });
 
 
+
+
 function saveGroup(event){
 	
     event.preventDefault();
-    $(".alert").html("").hide();
-    $(".error-list").html("");
-    
+        
     var formData= $('#groupForm').serialize();
     
     $.post(serverContext + "teacher/group/save",formData ,function(data){
@@ -531,38 +527,6 @@ function saveGroup(event){
     });
 }
 
-/* $(document).ready(function () {
-    
-	 $('#save').on('click', function (e) {
-	    	saveAssignment(e);
-	 });
-    
-});
-
-
- function saveAssignment(event){
-	
-    event.preventDefault();
-    
-    var action = $("#save").attr("name");
-    
-    var formData = $('#assignmentForm').serialize() + "&" + action; 
-    
-    $.post(serverContext +"teacher/assignment",formData,function(data){
-    	
-    	successMsg(data.message);
-    	
-    }).fail(function(data) {
-        if(data.responseJSON.error.indexOf("InternalError") > -1){
-        	errorMsg(data.responseJSON.message);
-        }else{
-        	var errors = $.parseJSON(data.responseJSON.message);
-            $.each( errors, function( index,item ){
-                errorMsg(item.defaultMessage);
-            });
-        }
-    });
-}  */
 
 
 $(document).ready(function () {

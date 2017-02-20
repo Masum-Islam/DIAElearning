@@ -41,5 +41,10 @@ public interface IUserService {
     String validateVerificationToken(String token);
 
     List<User> findByRoles(String name);
-
+    
+    List<User> findByRolesNameAndEmailIgnoreCaseContainingOrFirstNameIgnoreCaseContainingOrLastNameIgnoreCaseContaining(String roleName,String email,String firstName,String lastName);
+    
+    Iterable<User> searchEmail(String filter);
+    
 }
+

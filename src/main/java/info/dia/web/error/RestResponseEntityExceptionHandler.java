@@ -59,7 +59,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }*/
 
     // 404
-    @ExceptionHandler({ UserNotFoundException.class })
+    @ExceptionHandler({UserNotFoundException.class })
     public ResponseEntity<Object> handleUserNotFound(final RuntimeException ex, final WebRequest request) {
         logger.error("404 Status Code", ex);
         final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.userNotFound", null, request.getLocale()), "UserNotFound");
@@ -81,6 +81,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.groupNameError", null, request.getLocale()), "GroupNameAlreadyExist");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
+    
+    // 409
+    @ExceptionHandler({AssignmentTitleAlreadyExistsByUserException.class })
+    public ResponseEntity<Object> handleAssignmentTitleAlreadyExist(final RuntimeException ex, final WebRequest request) {
+        logger.error("409 Status Code", ex);
+        final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.assignmentTitleError", null, request.getLocale()), "AssignmentTitleAlreadyExistByUser");
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+    
 
     // 500
     @ExceptionHandler({MailAuthenticationException.class })

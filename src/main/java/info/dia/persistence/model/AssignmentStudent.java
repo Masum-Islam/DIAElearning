@@ -42,9 +42,9 @@ public class AssignmentStudent {
     @JoinColumn(name = "assignment_id")
 	private Assignment assignment;
 	
-	@OneToOne
+	/*@OneToOne
 	@JoinColumn(name="groupId")
-	private Group group;
+	private Group group;*/
 	
 
 	public AssignmentStudent() {
@@ -107,13 +107,13 @@ public class AssignmentStudent {
 		this.submitDate = submitDate;
 	}
 
-	public Group getGroup() {
+	/*public Group getGroup() {
 		return group;
 	}
 
 	public void setGroup(Group group) {
 		this.group = group;
-	}
+	}*/
 
 
 }

@@ -10,11 +10,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mysema.query.jpa.JPASubQuery;
+import com.mysema.query.jpa.impl.JPAQuery;
+import com.mysema.query.types.Predicate;
+
 import info.dia.persistence.dao.PasswordResetTokenRepository;
 import info.dia.persistence.dao.RoleRepository;
 import info.dia.persistence.dao.UserRepository;
 import info.dia.persistence.dao.VerificationTokenRepository;
 import info.dia.persistence.model.PasswordResetToken;
+import info.dia.persistence.model.QRole;
+import info.dia.persistence.model.QUser;
 import info.dia.persistence.model.User;
 import info.dia.persistence.model.VerificationToken;
 import info.dia.web.dto.UserDto;
@@ -42,10 +48,10 @@ public class UserService implements IUserService {
     public static final String TOKEN_INVALID = "invalidToken";
     public static final String TOKEN_EXPIRED = "expired";
     private static final String TOKEN_VALID = "valid";
-
-
+    
+    
+   
     // API
-
     @Override
     public User registerNewUserAccount(final UserDto accountDto) {
     	
@@ -181,13 +187,30 @@ public class UserService implements IUserService {
         }
         return false;
     }
-
 	
 
 	@Override
 	public List<User> findByRoles(String name) {
-		// TODO Auto-generated method stub
 		return repository.findByRolesName(name);
+	}
+
+	@Override
+	public List<User> findByRolesNameAndEmailIgnoreCaseContainingOrFirstNameIgnoreCaseContainingOrLastNameIgnoreCaseContaining(
+			String roleName, String email, String firstName, String lastName) {
+		return repository.findByRolesNameAndEmailIgnoreCaseContainingOrFirstNameIgnoreCaseContainingOrLastNameIgnoreCaseContaining(roleName, email, firstName, lastName);
+	}
+
+	@Override
+	public Iterable<User> searchEmail(String filter) {
+		
+		QUser qUser = QUser.user;
+		
+
+		Predicate predicate = qUser.email.containsIgnoreCase(filter)
+				   .and(qUser.roles.any().name.eq("ROLE_USER"));
+		
+		
+		return repository.findAll(predicate);
 	}
 
 }

@@ -2,16 +2,14 @@ package info.dia.web.dto;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
-
-import info.dia.persistence.model.GroupDetails;
 
 public class AssignmentDto implements Serializable{
 
@@ -24,6 +22,7 @@ public class AssignmentDto implements Serializable{
 	private String title;
 	
 	@NotNull(message="{NotNull.assignmentDto.session}")
+	@NotEmpty(message="{NotEmpty.assignmentDto.session}")
 	private String session;
 	
 	@NotNull(message="{NotNull.assignmentDto.submitStartDate}")
@@ -36,9 +35,11 @@ public class AssignmentDto implements Serializable{
 	@DateTimeFormat ( pattern="yyyy-MM-dd HH:mm")
 	private Date submitEndDate;
 	
+	private Boolean status;
+	
 	private String instructions;
 	
-	private List<GroupDetails> emails;
+	private String emailsTo;
 
 
 	public long getId() {
@@ -101,12 +102,23 @@ public class AssignmentDto implements Serializable{
 	}
 
 
-	public List<GroupDetails> getEmails() {
-		return emails;
+	public Boolean getStatus() {
+		return status;
 	}
 
 
-	public void setEmails(List<GroupDetails> emails) {
-		this.emails = emails;
+	public void setStatus(Boolean status) {
+		this.status = status;
 	}
+
+
+	public String getEmailsTo() {
+		return emailsTo;
+	}
+
+
+	public void setEmailsTo(String emailsTo) {
+		this.emailsTo = emailsTo;
+	}
+	
 }

@@ -13,5 +13,7 @@ public interface IGroupService {
 	List<Group> findByUser(User user);
 	
 	Group getByGroupId(long groupId);
+	
+	List<Group> findAllByUser(User user);
 
 }

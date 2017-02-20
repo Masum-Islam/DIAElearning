@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,7 +29,7 @@ public class Assignment {
 	
 	private String session;
 	
-	private boolean status;
+	private Boolean status;
 	
 	@Column(columnDefinition = "TEXT")
 	private String instructions;
@@ -55,7 +56,7 @@ public class Assignment {
 	@JoinColumn(name = "user_id")
 	private User user;
 	
-	@OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AssignmentStudent> assignmentStudents;
 	
 	
@@ -166,12 +167,12 @@ public class Assignment {
 	}
 
 
-	public boolean isStatus() {
+	public Boolean getStatus() {
 		return status;
 	}
 
 
-	public void setStatus(boolean status) {
+	public void setStatus(Boolean status) {
 		this.status = status;
 	}
 
