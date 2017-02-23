@@ -61,4 +61,13 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 		return assignmentStudentRepository.findAll(b, pageable);
 	}
 
+
+	@Override
+	public AssignmentStudent findByAssignmentStudentId(long assignmentStudentId) {
+		return assignmentStudentRepository.findOne(assignmentStudentId);
+	}
+
+
+	
+
 }

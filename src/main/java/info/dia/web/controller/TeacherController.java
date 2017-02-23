@@ -24,6 +24,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -391,7 +392,46 @@ public class TeacherController {
     	return "/teacher/viewAssignment";
 	}
 	
+	/*@RequestMapping(value="/editAssignmentStudent",method=RequestMethod.GET)
+	public String editAssignmentStudent(@RequestParam(value="assignmentIds[]", required=false) String[] assignmentIds){
+		
+		if (assignmentIds!=null) {
+			for (String string : assignmentIds) {
+				if (!StringUtils.isEmpty(string)) {
+					LOGGER.info("Edit Assignment Student Id "+string);
+				}
+			}
+		}
+		
+		return "/teacher/editAssignmentStudent";
+	}*/
 	
+	@RequestMapping(value="/editAssignmentStudent/{assignmentStudentIds}",method=RequestMethod.GET)
+	public String editAssignmentStudent(@PathVariable String[] assignmentStudentIds){
+		
+		Authentication authentication = authenticationFacade.getAuthentication();
+		
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		
+    		User currentUser = userService.findUserByEmail(authentication.getName());
+    		
+    		if (assignmentStudentIds!=null) {
+    			for (String string : assignmentStudentIds) {
+    				LOGGER.info("string :"+string);
+    				if (!StringUtils.isEmpty(string)) {
+    					AssignmentStudent assignmentStudent = assignmentStudentService.findByAssignmentStudentId(Long.parseLong(string));
+    					boolean result = isAssignmentStudentExistsUser(assignmentStudent, currentUser);
+    					if (result) {
+							LOGGER.info("User Assignment Email :"+assignmentStudent.getEmail());
+						}
+    				}
+    			}
+    		}
+    	}
+    	
+    	
+		return "/teacher/editAssignmentStudent";
+	}
 
 	
 	@RequestMapping(value="/assignmentEmail.json/{query}",method=RequestMethod.GET)
@@ -543,7 +583,17 @@ public class TeacherController {
     	 return count;
     }
     
-   
+   public boolean isAssignmentStudentExistsUser(AssignmentStudent assignmentStudent,User user){
+	   
+	   boolean flag = false;
+	   
+	   Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentStudent.getAssignment().getId(), user.getId());
+	   if (assignment!=null) {
+		   flag = true;
+	   }
+	   
+	   return flag;
+   }
 	
 
 }

@@ -12,5 +12,7 @@ public interface IAssignmentStudentService {
 	Page<AssignmentStudent> findAllByAssignment(Assignment assignment,Pageable pageable);
 	
 	Page<AssignmentStudent> searchAssignmentStudent(Assignment assignment,SearchDTO dto,Pageable pageable);
+	
+	AssignmentStudent findByAssignmentStudentId(long assignmentStudentId);
 
 }

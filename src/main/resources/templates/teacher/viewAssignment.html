@@ -8,6 +8,7 @@
 <body>
 
 	<th:block layout:fragment="script">
+	
 		<link th:href="@{/assets/css/tableResponsive.css}" rel="stylesheet" type="text/css" />
 		
 		<script>
@@ -15,6 +16,42 @@
 			$('#th_Checkbox').click(
 					function(e) {
 						$(this).closest('table').find('td input:checkbox').prop('checked', this.checked);
+			});
+			
+			function errorMsg(msg){
+				
+				$.notify(msg, {
+					type: "danger",
+					delay: 5000,
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					},
+					newest_on_top: true
+				});
+			}
+			
+			$(document).ready(function() {
+			   var tableControl= document.getElementById('allAssignmentStudentTable');
+			   var assignmentStudnetIds = [];
+			   var ajaxURL = "/teacher/editAssignmentStudent";
+			    $('#editAssignmentStudent').click(function() {
+			    	 	$('input:checkbox:checked', tableControl).each(function() {
+			    	 		assignmentStudnetIds.push($(this).closest('tr').find('td.assignmentStudentId').text());
+				        }).get();
+			    	 	
+			    	 	if(assignmentStudnetIds.length>0){
+			    	 		 assignmentStudnetIds = assignmentStudnetIds.filter(function(e){return e}); 
+			    	 		 ajaxURL = ajaxURL+'/'+assignmentStudnetIds;
+			    	 	}
+			    	 	
+			    	 	$.get(ajaxURL,function(){
+			    	    	window.location.href = ajaxURL;
+			    	    	console.log(assignmentStudnetIds);
+			    	    }).fail(function() {
+			    	    	errorMsg("please select an email");
+			    	    });
+			    });
 			});
 		</script>
 		
@@ -89,7 +126,7 @@
 						
 						<div id="no-more-tables" class="portlet-body form">
 
-							<table id="allAssignmentTable" class="col-md-12 table-bordered table-striped table-condensed cf">
+							<table id="allAssignmentStudentTable" class="col-md-12 table-bordered table-striped table-condensed cf">
 
 								<thead class="cf">
 									<tr>
@@ -113,7 +150,8 @@
 								<tbody th:if="${not #lists.isEmpty(assignmentStudentInfos)}">
 									<tr th:each="assignmentStudentInfo,rowStat : ${assignmentStudentInfos}">
 										<!-- <td th:text="${rowStat.count}">1</td> -->
-										<td><input type="checkbox"  id="td_Checkbox" /></td>
+										<td><input type="checkbox" id="td_Checkbox" /></td>
+										<td class="assignmentStudentId" style="display:none;" th:text="${assignmentStudentInfo.assignmentStudentId}"></td>
 										<td data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
 										
 										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == true">Submitted</td>
@@ -132,6 +170,7 @@
 											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download" href="#"><span class="fa fa-download"></span></a>
 											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete" href="#"><span class="glyphicon glyphicon-trash"></span></a>
 										</td>
+										
 									</tr>
 								</tbody>
 								
@@ -143,7 +182,6 @@
 							</table>
 
 						<div th:if="${isSearch}=='true'">
-							
 							<div class="row">
 							<div th:if="${assignmentStudents.getTotalPages() > 0}">
 								<div th:if="${assignmentStudents.getTotalPages() > 1}"
@@ -177,7 +215,6 @@
 						</div>
 
 						<div th:if="${isSearch==null}">
-							
 						<div class="row">
 							<div th:if="${assignmentStudents.getTotalPages() > 0}">
 								<div th:if="${assignmentStudents.getTotalPages() > 1}"

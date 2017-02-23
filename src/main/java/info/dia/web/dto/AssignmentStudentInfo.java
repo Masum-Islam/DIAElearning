@@ -16,9 +16,7 @@ public class AssignmentStudentInfo implements Serializable{
 	private Date submitedDate;
 	private Date startDate;
 	private Date lastDateOfSubmission;
-	
-	/*private int totalNumberOfStudents;
-	private int totalNumberOfSubmittedStudent;*/
+	private Boolean selected;
 	
 	
 	public long getAssignmentId() {
@@ -57,18 +55,6 @@ public class AssignmentStudentInfo implements Serializable{
 	public void setLastDateOfSubmission(Date lastDateOfSubmission) {
 		this.lastDateOfSubmission = lastDateOfSubmission;
 	}
-	/*public int getTotalNumberOfStudents() {
-		return totalNumberOfStudents;
-	}
-	public void setTotalNumberOfStudents(int totalNumberOfStudents) {
-		this.totalNumberOfStudents = totalNumberOfStudents;
-	}
-	public int getTotalNumberOfSubmittedStudent() {
-		return totalNumberOfSubmittedStudent;
-	}
-	public void setTotalNumberOfSubmittedStudent(int totalNumberOfSubmittedStudent) {
-		this.totalNumberOfSubmittedStudent = totalNumberOfSubmittedStudent;
-	}*/
 	public Boolean getStatus() {
 		return status;
 	}
@@ -80,6 +66,12 @@ public class AssignmentStudentInfo implements Serializable{
 	}
 	public void setAssignmentStudentId(long assignmentStudentId) {
 		this.assignmentStudentId = assignmentStudentId;
+	}
+	public Boolean getSelected() {
+		return selected;
+	}
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
 	}
 	
 	
