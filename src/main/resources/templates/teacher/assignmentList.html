@@ -42,8 +42,6 @@
 									</a>
 									<ul class="dropdown-menu pull-right">
 										<li><a th:href="@{/teacher/assignment}"><i class="fa fa-plus-circle"></i>Create Assignment</a></li>
-										<li><a th:href="@{/teacher/assignments}"> <i class="fa fa-eye"></i>View Assignments</a></li>
-										<li><a href="javascript:;"> <i class="fa fa-pencil"></i>Edit Assignment</a></li>
 									</ul>
 								</div>
 							</div>
@@ -79,7 +77,7 @@
 										<span data-toggle="tooltip" data-placement="top" title="Submitted" class="fa fa-upload"></span>
 										</th>
 										<!-- <th>Time Remains</th> -->
-										<th width="15%">
+										<th width="18%">
 										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
 										</th>
 									</tr>
@@ -101,10 +99,11 @@
 
 										<!-- <td>Time Remains</td> -->
 										<td data-title="Actions" >
-											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File(s) To Assignment" href="#"><span class="fa fa-files-o"></span></a>
+											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Student" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
 											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit Assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
 											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " href="#"><span class="fa fa-download"></span></a>
-											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete Assignment" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Cancel Assignment" href="#"><span class="glyphicon glyphicon-stop"></span></a>
 										</td>
 									</tr>
 								</tbody>

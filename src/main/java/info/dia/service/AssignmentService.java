@@ -327,4 +327,10 @@ public class AssignmentService implements IAssignmentService{
 	public Assignment findByUserAndTitleIgnoreCase(User user, String title) {
 		return assignmentRepository.findByUserAndTitleIgnoreCase(user, title);
 	}
+
+
+	@Override
+	public Assignment getAssignmentById(long assignmentId) {
+		return assignmentRepository.findOne(assignmentId);
+	}
 }

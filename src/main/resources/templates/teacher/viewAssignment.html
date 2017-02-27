@@ -33,23 +33,29 @@
 			
 			$(document).ready(function() {
 			   var tableControl= document.getElementById('allAssignmentStudentTable');
+			   var assignmentId = $( "#assignmentId" ).val();
+			   console.log("AssignmentId :"+assignmentId);
+			   
 			   var assignmentStudnetIds = [];
+			   
 			   var ajaxURL = "/teacher/editAssignmentStudent";
+			   
 			    $('#editAssignmentStudent').click(function() {
-			    	 	$('input:checkbox:checked', tableControl).each(function() {
+			    	 	
+			    		$('input:checkbox:checked', tableControl).each(function() {
 			    	 		assignmentStudnetIds.push($(this).closest('tr').find('td.assignmentStudentId').text());
 				        }).get();
 			    	 	
 			    	 	if(assignmentStudnetIds.length>0){
 			    	 		 assignmentStudnetIds = assignmentStudnetIds.filter(function(e){return e}); 
 			    	 		 ajaxURL = ajaxURL+'/'+assignmentStudnetIds;
-			    	 	}
+			    	 	} 
 			    	 	
-			    	 	$.get(ajaxURL,function(){
-			    	    	window.location.href = ajaxURL;
+			    	 	$.get(ajaxURL+"?assignmentId="+assignmentId,function(){
+			    	    	window.location.href = ajaxURL+"?assignmentId="+assignmentId;
 			    	    	console.log(assignmentStudnetIds);
 			    	    }).fail(function() {
-			    	    	errorMsg("please select an email");
+			    	    	errorMsg("Please select an email");
 			    	    });
 			    });
 			});
@@ -66,7 +72,7 @@
 				<!-- <form id="viewAssignmentForm" th:object="${assignment}"> -->
 					<div class="portlet light ">
 						<div class="portlet-title">
-						
+							<input type="hidden" id="assignmentId" th:value="${assignment.id}" />
 							<div class="caption font-blue-sharp col-md-3">
 								<i class="fa fa-sticky-note-o font-red-sunglo" data-toggle="tooltip" data-placement="top" title="Assignment Name"></i> <span
 									class="caption-subject bold" th:text="${assignment.title}">View
@@ -111,11 +117,16 @@
 										class="fa fa-angle-down"></i>
 									</a>
 									<ul class="dropdown-menu pull-right">
-										<li><a th:href="@{/teacher/assignment}"><i
-												class="fa fa-plus-circle"></i>Create Assignment</a></li>
-										<li><a th:href="@{/teacher/assignments}"> <i
+										<li>
+										<a th:href="@{/teacher/assignment}"><i
+												class="fa fa-plus-circle"></i>Create Assignment
+										</a>
+										</li>
+										<li>
+										<a th:href="@{/teacher/assignments}"> <i
 												class="fa fa-eye"></i>View Assignments
-										</a></li>
+										</a>
+										</li>
 									</ul>
 								</div>
 							</div>
@@ -142,9 +153,9 @@
 										<span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span>
 										</th>
 										<!-- <th>Time Remains</th> -->
-										<th width="12%">
+										<!-- <th width="12%">
 										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
-										</th>
+										</th> -->
 									</tr>
 								</thead>
 								<tbody th:if="${not #lists.isEmpty(assignmentStudentInfos)}">
@@ -165,11 +176,11 @@
 										
 
 										<!-- <td>Time Remains</td> -->
-										<td data-title="Actions" >
+										<!-- <td data-title="Actions" >
 											<a class="btn btn-icon-only green" data-toggle="tooltip" data-placement="top" title="Edit"  href="#"><span class="glyphicon glyphicon-pencil"></span></a>
 											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download" href="#"><span class="fa fa-download"></span></a>
 											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-										</td>
+										</td> -->
 										
 									</tr>
 								</tbody>

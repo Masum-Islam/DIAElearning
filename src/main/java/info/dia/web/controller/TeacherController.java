@@ -5,9 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import javax.servlet.http.HttpSession;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
+import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
 import info.dia.persistence.model.Group;
@@ -47,6 +50,7 @@ import info.dia.service.IUserService;
 import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
 import info.dia.web.dto.AssignmentStudentInfo;
+import info.dia.web.dto.AssignmentStudentListDto;
 import info.dia.web.dto.EmailsDto;
 import info.dia.web.dto.GroupDto;
 import info.dia.web.dto.SearchDTO;
@@ -86,6 +90,10 @@ public class TeacherController {
 	
 	@Autowired
 	private IAssignmentStudentService assignmentStudentService;
+	
+	
+	@Autowired
+	private AssignmentStudentRepository assignmentStudentRepository; 
 	
 	
 	private static final int BUTTONS_TO_SHOW = 5;
@@ -391,23 +399,9 @@ public class TeacherController {
     	
     	return "/teacher/viewAssignment";
 	}
-	
-	/*@RequestMapping(value="/editAssignmentStudent",method=RequestMethod.GET)
-	public String editAssignmentStudent(@RequestParam(value="assignmentIds[]", required=false) String[] assignmentIds){
 		
-		if (assignmentIds!=null) {
-			for (String string : assignmentIds) {
-				if (!StringUtils.isEmpty(string)) {
-					LOGGER.info("Edit Assignment Student Id "+string);
-				}
-			}
-		}
-		
-		return "/teacher/editAssignmentStudent";
-	}*/
-	
 	@RequestMapping(value="/editAssignmentStudent/{assignmentStudentIds}",method=RequestMethod.GET)
-	public String editAssignmentStudent(@PathVariable String[] assignmentStudentIds){
+	public String editAssignmentStudent(Model model,@RequestParam(value="assignmentId") Long assignmentId,@PathVariable String[] assignmentStudentIds){
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
 		
@@ -415,24 +409,71 @@ public class TeacherController {
     		
     		User currentUser = userService.findUserByEmail(authentication.getName());
     		
+    		Assignment assignment = assignmentService.getAssignmentById(assignmentId);
+    		
+    		AssignmentStudentListDto assignmentStudentListDto = new AssignmentStudentListDto();
+    		assignmentStudentListDto.setAssignmentId(assignment.getId());
+    		
+    		
+    		List<AssignmentStudentInfo> assignmentStudentInfos = new ArrayList<>();
+    		
     		if (assignmentStudentIds!=null) {
     			for (String string : assignmentStudentIds) {
-    				LOGGER.info("string :"+string);
     				if (!StringUtils.isEmpty(string)) {
     					AssignmentStudent assignmentStudent = assignmentStudentService.findByAssignmentStudentId(Long.parseLong(string));
-    					boolean result = isAssignmentStudentExistsUser(assignmentStudent, currentUser);
+    					AssignmentStudentInfo assignmentStudentInfo = new AssignmentStudentInfo();
+    					boolean result = isAssignmentStudentExistsUserAssignment(assignmentStudent, currentUser);
     					if (result) {
-							LOGGER.info("User Assignment Email :"+assignmentStudent.getEmail());
+    						assignmentStudentInfo.setAssignmentId(assignment.getId());
+    						assignmentStudentInfo.setAssignmentStudentId(assignmentStudent.getId());
+    						assignmentStudentInfo.setEmail(assignmentStudent.getEmail());
+    						assignmentStudentInfo.setStatus(assignmentStudent.isStatus());
+    						assignmentStudentInfo.setSubmitedDate(assignmentStudent.getSubmitDate());
+    						assignmentStudentInfo.setLastDateOfSubmission(assignmentStudent.getSubmitEndDate());
 						}
+    					assignmentStudentInfos.add(assignmentStudentInfo);
     				}
     			}
+    			assignmentStudentListDto.setAssignmentStudents(assignmentStudentInfos);
     		}
+    		model.addAttribute("assignment", assignment);
+    		model.addAttribute("assignmentStudentListDto", assignmentStudentListDto);
     	}
     	
     	
 		return "/teacher/editAssignmentStudent";
 	}
+	
+	
+	@RequestMapping(value="/updateAssignmentStudentDate",method=RequestMethod.POST)
+	@ResponseBody
+	public GenericResponse updateAssignmentStudentDate(final Locale locale,@ModelAttribute AssignmentStudentListDto dto){
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		
+		for (AssignmentStudentInfo assignmentStudentInfo : dto.getAssignmentStudents()) {
+			
+			AssignmentStudent assignmentStudent = assignmentStudentService.findByAssignmentStudentId(assignmentStudentInfo.getAssignmentStudentId());
+			if (assignmentStudent!=null) {
+				try {
+					if (dto.getSubmitEndDate()!=null && !StringUtils.isEmpty(dto.getSubmitEndDate())) {
+						assignmentStudent.setSubmitEndDate(dateFormat.parse(dto.getSubmitEndDate()));
+					}
+					
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			assignmentStudentRepository.saveAndFlush(assignmentStudent);
+			
+		}
+		
+		
+    	return new GenericResponse(messages.getMessage("message.assignmentStudentLastDateOfSubmissionUpdateSuc", null, locale));
+	}
 
+	
 	
 	@RequestMapping(value="/assignmentEmail.json/{query}",method=RequestMethod.GET)
 	@ResponseBody
@@ -583,7 +624,7 @@ public class TeacherController {
     	 return count;
     }
     
-   public boolean isAssignmentStudentExistsUser(AssignmentStudent assignmentStudent,User user){
+   public boolean isAssignmentStudentExistsUserAssignment(AssignmentStudent assignmentStudent,User user){
 	   
 	   boolean flag = false;
 	   

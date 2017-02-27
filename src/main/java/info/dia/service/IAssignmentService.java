@@ -14,6 +14,8 @@ import info.dia.web.dto.SearchDTO;
 
 public interface IAssignmentService {
 	
+	Assignment getAssignmentById(long assignmentId);
+	
 	void saveAssignment(AssignmentDto assignmentDto);
 	
 	List<AssignmentInfoDto> findByUser(User user, Pageable pageable);
