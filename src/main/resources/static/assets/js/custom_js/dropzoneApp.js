@@ -76,6 +76,66 @@ $(document).ready(function() {
 		}
 	}
 	
+	var assignmentId = $("#assignmentId").val();
+	console.log("AssignmentId :"|+assignmentId);
+	// "Assignment Document Dropzone" is the camel-case version of the form id "dropzone-form"
+	Dropzone.options.assignmentDocumentDropzone  = {
+		
+		/*url : "/teacher/uploadAssignmentDocument?assignmentId="+assignmentId,*/
+		acceptedFiles: ".doc,.docx,.pdf,.zip,.rar",
+		autoProcessQueue : false,
+		uploadMultiple : true,
+		maxFilesize : 25, // MB
+		parallelUploads : 100,
+		maxFiles : 100,
+		maxfilesexceeded: function(file) {
+	        this.removeAllFiles();
+	        this.addFile(file);
+	    },
+		addRemoveLinks : true,
+		previewsContainer : ".dropzone-previews",
+
+		// The setting up of the dropzone
+		init : function() {
+
+			var myDropzone = this;
+
+			// first set autoProcessQueue = false
+			$('#document-upload-button').on("click", function(e) {
+
+				myDropzone.processQueue();
+				
+			});
+
+			// customizing the default progress bar
+			this.on("uploadprogress", function(file, progress) {
+
+				progress = parseFloat(progress).toFixed(0);
+
+				var progressBar = file.previewElement.getElementsByClassName("dz-upload")[0];
+				progressBar.innerHTML = progress + "%";
+				
+			});
+			
+			this.on("error", function(file, response) {
+                // do stuff here.
+                /*alert(response);*/
+                errorMsg(response);
+            });
+			
+			// displaying the uploaded files information in a Bootstrap dialog
+			this.on("successmultiple", function(files, serverResponse) {
+				successMsg("Assignment Document Upload Successfully");
+				/*showInformationDialog(files, serverResponse);*/
+			});
+			
+			this.on("complete", function(file) {
+				this.removeFile(file);
+			});
+			
+		}
+	}
+	
 
 	function showInformationDialog(files, objectArray) {
 

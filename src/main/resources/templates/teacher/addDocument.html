@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layouts/main">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{label.pages.teacher.assignment.document}">Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+	<div class="page-content-inner">
+			<div class="row">
+				<div>
+					<!-- BEGIN SAMPLE FORM PORTLET-->
+					<div class="portlet light ">
+						<div class="portlet-title">
+							<div class="caption font-red-sunglo">
+								<i class="icon-settings font-red-sunglo"></i> <span
+									class="caption-subject bold">Upload Assignment Document</span>
+							</div>
+							<div class="actions">
+								<div class="btn-group">
+									<a class="btn btn-sm green btn-outline dropdown-toggle" href="javascript:;"
+										data-toggle="dropdown"> Actions <i
+										class="fa fa-angle-down"></i>
+									</a>
+									<ul class="dropdown-menu pull-right">
+										<li><a th:href="@{/teacher/assignments}"> <i class="fa fa-eye"></i>View Assignments</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="portlet-body form">
+							<span class="label label-danger">Maximum file size is 25
+								MB</span>
+
+							<form id="assignment-document-dropzone" class="dropzone"	th:object="${assignmentDocument}" th:action="@{/teacher/uploadAssignmentDocument/(assignmentId=${assignmentDocument.assignmentId})}" enctype="multipart/form-data">
+								<input type="hidden" id="assignmentId" th:field="*{assignmentId}" />
+								<div
+									class="dz-default dz-message file-dropzone text-center well col-sm-12">
+
+									<span class="glyphicon glyphicon-paperclip"></span> <span>
+										To attach files, drag and drop here</span><br /> <span>OR</span><br />
+									<span>Just Click</span>
+								</div>
+
+								<!-- this is were the previews should be shown. -->
+								<div class="dropzone-previews"></div>
+							</form>
+							<hr />
+							<div th:style="'text-align:right'">
+								<button id="document-upload-button" class="btn btn-primary">
+									<span class="glyphicon glyphicon-upload"></span> Upload
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>
+
+</body>
+</html>

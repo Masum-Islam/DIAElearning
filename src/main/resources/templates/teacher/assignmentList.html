@@ -99,7 +99,7 @@
 
 										<!-- <td>Time Remains</td> -->
 										<td data-title="Actions" >
-											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File(s) To Assignment" href="#"><span class="fa fa-files-o"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File(s) To Assignment" th:href="@{/teacher/addDocument/} + ${assignmentInfoDto.id}"><span class="fa fa-files-o"></span></a>
 											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Student" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
 											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit Assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
 											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " href="#"><span class="fa fa-download"></span></a>

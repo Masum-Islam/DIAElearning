@@ -1,17 +1,22 @@
 package info.dia.web.controller;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -33,17 +38,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.dao.AssignmentRepository;
 import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
+import info.dia.persistence.model.Document;
 import info.dia.persistence.model.Group;
 import info.dia.persistence.model.GroupDetails;
 import info.dia.persistence.model.User;
 import info.dia.service.IAssignmentService;
 import info.dia.service.IAssignmentStudentService;
+import info.dia.service.IDocumentService;
 import info.dia.service.IGroupDetailsService;
 import info.dia.service.IGroupService;
 import info.dia.service.IUserService;
@@ -51,6 +60,7 @@ import info.dia.web.dto.AssignmentDto;
 import info.dia.web.dto.AssignmentInfoDto;
 import info.dia.web.dto.AssignmentStudentInfo;
 import info.dia.web.dto.AssignmentStudentListDto;
+import info.dia.web.dto.DocumentDto;
 import info.dia.web.dto.EmailsDto;
 import info.dia.web.dto.GroupDto;
 import info.dia.web.dto.SearchDTO;
@@ -96,6 +106,10 @@ public class TeacherController {
 	private AssignmentStudentRepository assignmentStudentRepository; 
 	
 	
+	@Autowired
+	private IDocumentService uploadService;
+	
+	
 	private static final int BUTTONS_TO_SHOW = 5;
 	private static final int INITIAL_PAGE = 0;
 	private static final int INITIAL_PAGE_SIZE = 5;
@@ -113,7 +127,6 @@ public class TeacherController {
 		Authentication authentication = authenticationFacade.getAuthentication();
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
     		String roleName = "ROLE_USER";
-    		LOGGER.info("User List size:"+userService.findByRoles(roleName));
     		model.addAttribute("assignmentDto",new AssignmentDto());
     		model.addAttribute("emailsFrom",userService.findByRoles(roleName));
     	}
@@ -189,6 +202,57 @@ public class TeacherController {
 		     }
 		return "/teacher/assignmentList";
 	}
+	
+	//Assignment Document
+	@RequestMapping(value="/addDocument/{assignmentId}",method=RequestMethod.GET)
+	public String addDocumentsToAssignment(Model model,@PathVariable Long assignmentId){
+		
+		DocumentDto documentDto = new DocumentDto();
+		documentDto.setAssignmentId(assignmentId);
+		
+		model.addAttribute("assignmentDocument", documentDto);
+		
+		return "/teacher/addDocument";
+	}
+	
+	
+	@RequestMapping(value = "/uploadAssignmentDocument", method = RequestMethod.POST)
+	  public @ResponseBody List<DocumentDto> upload(MultipartHttpServletRequest request,HttpServletResponse response,@RequestParam(value="assignmentId") Long assignmentId) throws IOException {
+
+		Authentication authentication = authenticationFacade.getAuthentication();
+		List<DocumentDto> uploadedFiles = null;
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		
+    		User user = userService.findUserByEmail(authentication.getName());
+    		
+    		// Getting uploaded files from the request object
+    	    Map<String, MultipartFile> fileMap = request.getFileMap();
+
+    	    // Maintain a list to send back the files info. to the client side
+    	    uploadedFiles = new ArrayList<DocumentDto>();
+
+    	    // Iterate through the map
+    	    for (MultipartFile multipartFile : fileMap.values()) {
+
+    	      // Save the file to local disk
+    	      saveFileToLocalDisk(multipartFile,user);
+
+    	      LOGGER.info("Assignment Id :"+assignmentId);
+    	      
+    	      DocumentDto fileInfo = getUploadedFileInfo(multipartFile,user,assignmentId);
+    	      
+    	      // Save the file info to database
+    	      Document document = saveFileToDatabase(fileInfo);
+
+    	      // adding the file info to the list
+    	      uploadedFiles.add(fileInfo);
+    	    }
+    	    
+    	}
+	    
+
+	    return uploadedFiles;
+	  }
 	
 	
 	@RequestMapping(value = "/assignments/search",method=RequestMethod.GET)
@@ -636,5 +700,58 @@ public class TeacherController {
 	   return flag;
    }
 	
+	private void saveFileToLocalDisk(MultipartFile multipartFile,User user) throws IOException, FileNotFoundException {
+
+		String outputFileName = getOutputFilename(multipartFile,user);
+
+		// Get the filename and build the local file path
+		String filename = multipartFile.getOriginalFilename();
+		String filepath = Paths.get(outputFileName, filename).toString();
+
+		// Save the file locally
+		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(filepath)));
+		stream.write(multipartFile.getBytes());
+		stream.close();
+	}
+
+	private String getOutputFilename(MultipartFile multipartFile,User user) {
+
+		return getDestinationLocation(user);
+	}
+	
+	private Document saveFileToDatabase(DocumentDto uploadedFile) {
+
+	    return uploadService.saveOrUpdate(uploadedFile);
+
+	}
+	
+	private DocumentDto getUploadedFileInfo(MultipartFile multipartFile,User user,Long assignmentId) throws IOException {
+
+		 	DocumentDto fileInfo = new DocumentDto();
+		 	
+		    fileInfo.setName(multipartFile.getOriginalFilename());
+		    fileInfo.setSize(multipartFile.getSize());
+		    fileInfo.setType(multipartFile.getContentType());
+		    fileInfo.setLocation(getDestinationLocation(user));
+		    fileInfo.setUserId(user.getId());
+		    fileInfo.setAssignmentId(assignmentId);
+		    
+		    return fileInfo;
+	}
+	 
+	
+	private String getDestinationLocation(User user) {
+
+		String parrentDirectory = "D:/file_to_save/";
+		boolean flag = false;
+
+		File file = new File(parrentDirectory + user.getEmail());
+		if (!file.exists()) {
+			flag = file.mkdirs();
+		}
+
+		return file.getAbsolutePath();
+	}
+   
 
 }

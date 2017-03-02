@@ -24,7 +24,7 @@ public class AppConfig {
 	
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
     
-    private static final long maxUploadSize = 10485760; // 10 Mb
+    private static final long maxUploadSize = 26214400; // 25 Mb
     
 
     @Autowired
