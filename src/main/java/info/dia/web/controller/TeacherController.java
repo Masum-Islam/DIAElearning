@@ -50,6 +50,7 @@ import info.dia.persistence.model.Document;
 import info.dia.persistence.model.Group;
 import info.dia.persistence.model.GroupDetails;
 import info.dia.persistence.model.User;
+import info.dia.service.DocumentService;
 import info.dia.service.IAssignmentService;
 import info.dia.service.IAssignmentStudentService;
 import info.dia.service.IDocumentService;
@@ -66,6 +67,7 @@ import info.dia.web.dto.GroupDto;
 import info.dia.web.dto.SearchDTO;
 import info.dia.web.util.AssignmentMapper;
 import info.dia.web.util.AssignmentStudentMapper;
+import info.dia.web.util.DocumentMapper;
 import info.dia.web.util.GenericResponse;
 import info.dia.web.util.HelperUtils;
 
@@ -188,7 +190,7 @@ public class TeacherController {
 		    		
 		    		Page<Assignment> assignments = assignmentRepository.findByUser(user,pageRequest);
 		    		
-		    		LOGGER.info("User email 1:"+user.getEmail()+" Search Find :"+assignments.getTotalElements());
+		    		/*LOGGER.info("User email 1:"+user.getEmail()+" Search Find :"+assignments.getTotalElements());*/
 		    		
 		    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
 		    		
@@ -558,7 +560,28 @@ public class TeacherController {
 		}
 		
 		return emails;
-	}	
+	}
+	
+	@RequestMapping(value="/assignmentDocuments.json/{assignmentId}",method=RequestMethod.GET)
+	@ResponseBody
+	public List<DocumentDto> getAssignmentDocuments(@PathVariable("assignmentId") long assignmentId){
+		LOGGER.info("Inside Metod :"+assignmentId);
+		List<DocumentDto> assignmentsDocuments = new ArrayList<>();
+		Authentication authentication = authenticationFacade.getAuthentication();
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		User assignmentUser = userService.findUserByEmail(authentication.getName());
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId, assignmentUser.getId());
+    		if(assignment!=null){
+    			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
+    			if (documents.size()>0) {
+    				assignmentsDocuments = DocumentMapper.map(documents);
+    				LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());
+				}
+    		}
+    	}
+		return assignmentsDocuments;
+	}
+	
 	/* End Assignment Related Methods*/
 	
 	

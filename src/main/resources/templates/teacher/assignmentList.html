@@ -71,6 +71,9 @@
 										<span data-toggle="tooltip" data-placement="top" title="Submission Date" class="glyphicon glyphicon-time"></span>
 										</th>
 										<th>
+										<span data-toggle="tooltip" data-placement="top" title="No. of Assignment Documents" class="fa fa-files-o"></span>
+										</th>
+										<th>
 										<span data-toggle="tooltip" data-placement="top" title="No. of Students" class="fa fa-users"></span>
 										</th>
 										<th>
@@ -92,6 +95,8 @@
 										<td data-title="Assignment Status" th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentInfoDto.status} == false">Saved</td>
 										
 										<td data-title="Submission Date" th:text="${assignmentInfoDto.submitEndDate} ? ${#calendars.format(assignmentInfoDto.submitStartDate,'dd MMM yyyy hh:mm a')+' to '+#calendars.format(assignmentInfoDto.submitEndDate,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
+										
+										<td data-title="No. of Assignment Documents" align="center" th:text="${assignmentInfoDto.assignmentDocuments}">No. of Assignment Documents</td>
 										
 										<td data-title="No. of Students" align="center" th:text="${assignmentInfoDto.totalNumberOfStudent}">No. Of Students</td>
 										

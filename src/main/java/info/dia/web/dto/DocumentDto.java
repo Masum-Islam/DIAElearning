@@ -21,6 +21,8 @@ public class DocumentDto implements Serializable {
 	private String type;
 
 	private int status;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -85,13 +87,11 @@ public class DocumentDto implements Serializable {
 	public void setAssignmentId(Long assignmentId) {
 		this.assignmentId = assignmentId;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "DocumentDto [id=" + id + ", userId=" + userId + ", assignmentId=" + assignmentId + ", name=" + name
 				+ ", location=" + location + ", size=" + size + ", type=" + type + ", status=" + status + "]";
 	}
-
-	
 	
 }

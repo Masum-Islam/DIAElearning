@@ -4,13 +4,10 @@ import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
 import info.dia.web.dto.AssignmentInfoDto;
 import org.springframework.data.domain.Page;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Programmer on 2/2/2017.
- */
+
 public class AssignmentMapper {
 
 
@@ -38,6 +35,11 @@ public class AssignmentMapper {
             }
             infoDto.setTotalNumberOfSubmittedStudent(count);
         }
+        
+        if (assignment.getAssignmentDocuments().size()>0) {
+        	infoDto.setAssignmentDocuments(assignment.getAssignmentDocuments().size());
+		}
+        
         return infoDto;
     }
 

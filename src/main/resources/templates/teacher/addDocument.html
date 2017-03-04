@@ -34,8 +34,7 @@
 						</div>
 
 						<div class="portlet-body form">
-							<span class="label label-danger">Maximum file size is 25
-								MB</span>
+							<span class="label label-danger">Maximum file size is 25MB</span>
 
 							<form id="assignment-document-dropzone" class="dropzone"	th:object="${assignmentDocument}" th:action="@{/teacher/uploadAssignmentDocument/(assignmentId=${assignmentDocument.assignmentId})}" enctype="multipart/form-data">
 								<input type="hidden" id="assignmentId" th:field="*{assignmentId}" />

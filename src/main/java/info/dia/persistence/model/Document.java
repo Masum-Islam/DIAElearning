@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -28,7 +30,9 @@ public class Document {
 	  
 	  private Long userId;
 	  
-	  private long assignmentId;
+	  @ManyToOne
+	  @JoinColumn(name = "assignmentId")
+	  private Assignment assignment;
 	  
 	  @Column(nullable = false)
 	  private String name;
@@ -120,12 +124,13 @@ public class Document {
 	}
 
 
-	public long getAssignmentId() {
-		return assignmentId;
+	public Assignment getAssignment() {
+		return assignment;
 	}
 
 
-	public void setAssignmentId(long assignmentId) {
-		this.assignmentId = assignmentId;
+	public void setAssignment(Assignment assignment) {
+		this.assignment = assignment;
 	}
+
 }

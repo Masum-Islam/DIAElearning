@@ -99,6 +99,32 @@ $(document).ready(function() {
 		init : function() {
 
 			var myDropzone = this;
+			
+			/* //Call the action method to load the images from the server
+            $.getJSON("/teacher//assignmentDocuments.json/"+assignmentId).done(function (data) {
+                if (data.Data != '') {
+                    $.each(data.Data, function (index, item) {
+                            //// Create the mock file:
+                            var mockFile = {
+                                name: item.id,
+                                size: item.size
+                            };
+
+                            // Call the default addedfile event handler
+                            thisDropzone.emit("addedfile", mockFile);
+
+                            // And optionally show the thumbnail of the file:
+                            thisDropzone.emit("thumbnail", mockFile, item.name);
+
+                            // If you use the maxFiles option, make sure you adjust it to the
+                            // correct amount:
+                            //var existingFileCount = 1; // The number of files already uploaded
+                            //myDropzone.options.maxFiles = myDropzone.options.maxFiles - existingFileCount;
+                    });
+                }
+
+            });*/
+            
 
 			// first set autoProcessQueue = false
 			$('#document-upload-button').on("click", function(e) {
@@ -119,7 +145,6 @@ $(document).ready(function() {
 			
 			this.on("error", function(file, response) {
                 // do stuff here.
-                /*alert(response);*/
                 errorMsg(response);
             });
 			

@@ -31,6 +31,8 @@ public class AssignmentInfoDto implements Serializable{
     private int totalNumberOfStudent;
 
     private int totalNumberOfSubmittedStudent;
+    
+    private int assignmentDocuments;
 
     private Set<AssignmentStudent> emails;
     
@@ -115,6 +117,14 @@ public class AssignmentInfoDto implements Serializable{
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public int getAssignmentDocuments() {
+		return assignmentDocuments;
+	}
+
+	public void setAssignmentDocuments(int assignmentDocuments) {
+		this.assignmentDocuments = assignmentDocuments;
 	}
     
     

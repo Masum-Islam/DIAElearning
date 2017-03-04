@@ -1,6 +1,7 @@
 package info.dia.persistence.model;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -59,7 +60,8 @@ public class Assignment {
 	@OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AssignmentStudent> assignmentStudents;
 	
-	
+	@OneToMany(mappedBy = "assignment", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	private List<Document> assignmentDocuments;
 	
 
 	public Assignment() {
@@ -174,6 +176,18 @@ public class Assignment {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	
+	
+
+	public List<Document> getAssignmentDocuments() {
+		return assignmentDocuments;
+	}
+
+
+	public void setAssignmentDocuments(List<Document> assignmentDocuments) {
+		this.assignmentDocuments = assignmentDocuments;
 	}
 
 
