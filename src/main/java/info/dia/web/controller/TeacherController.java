@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -212,7 +215,23 @@ public class TeacherController {
 		DocumentDto documentDto = new DocumentDto();
 		documentDto.setAssignmentId(assignmentId);
 		
+		
+		List<DocumentDto> assignmentsDocuments = new ArrayList<>();
+		Authentication authentication = authenticationFacade.getAuthentication();
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		User assignmentUser = userService.findUserByEmail(authentication.getName());
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId, assignmentUser.getId());
+    		if(assignment!=null){
+    			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
+    			if (documents.size()>0) {
+    				assignmentsDocuments = DocumentMapper.map(documents);
+    				/*LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());*/
+				}
+    		}
+    	}
+    	
 		model.addAttribute("assignmentDocument", documentDto);
+		model.addAttribute("assignmentsDocuments", assignmentsDocuments);
 		
 		return "/teacher/addDocument";
 	}
@@ -251,8 +270,6 @@ public class TeacherController {
     	    }
     	    
     	}
-	    
-
 	    return uploadedFiles;
 	  }
 	
@@ -525,7 +542,6 @@ public class TeacherController {
 					if (dto.getSubmitEndDate()!=null && !StringUtils.isEmpty(dto.getSubmitEndDate())) {
 						assignmentStudent.setSubmitEndDate(dateFormat.parse(dto.getSubmitEndDate()));
 					}
-					
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
@@ -562,9 +578,10 @@ public class TeacherController {
 		return emails;
 	}
 	
-	@RequestMapping(value="/assignmentDocuments.json/{assignmentId}",method=RequestMethod.GET)
-	@ResponseBody
-	public List<DocumentDto> getAssignmentDocuments(@PathVariable("assignmentId") long assignmentId){
+	
+	
+	@RequestMapping(value="/assignmentDocuments/{assignmentId}",method=RequestMethod.GET)
+	public String getAssignmentDocuments(@PathVariable("assignmentId") long assignmentId,Model model){
 		LOGGER.info("Inside Metod :"+assignmentId);
 		List<DocumentDto> assignmentsDocuments = new ArrayList<>();
 		Authentication authentication = authenticationFacade.getAuthentication();
@@ -575,12 +592,39 @@ public class TeacherController {
     			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
     			if (documents.size()>0) {
     				assignmentsDocuments = DocumentMapper.map(documents);
-    				LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());
+    				/*LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());*/
+    				model.addAttribute("assignmentsDocuments", assignmentsDocuments);
 				}
     		}
     	}
-		return assignmentsDocuments;
+    	return "teacher/assignmentDocuments :: assignmentDocuments";
 	}
+	
+	//Assignment Document Download
+	@PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+    @RequestMapping(value = "/downloadDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
+    public void getFile(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
+
+		Authentication authentication = authenticationFacade.getAuthentication();
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			
+			User assignmentUser = userService.findUserByEmail(authentication.getName());
+
+			Document dataFile = uploadService.getDocumentByIdAndAssignmentIdAndUser(documentId, assignmentId, assignmentUser.getId());
+			if (dataFile!=null) {
+				LOGGER.info("dataFile :"+dataFile.getLocation()+"--->"+dataFile.getName());
+				File file = new File(dataFile.getLocation(), dataFile.getName());
+				try {
+					response.setContentType(dataFile.getType());
+					response.setHeader("Content-disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
+					FileCopyUtils.copy(FileUtils.readFileToByteArray(file), response.getOutputStream());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+    }
+	
 	
 	/* End Assignment Related Methods*/
 	

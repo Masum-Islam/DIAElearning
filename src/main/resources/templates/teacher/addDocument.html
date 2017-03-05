@@ -9,7 +9,12 @@
 </head>
 <body>
 
-<div layout:fragment="content">
+	<th:block layout:fragment="script">
+		
+		
+	</th:block>
+
+	<div layout:fragment="content">
 	<div class="page-content-inner">
 			<div class="row">
 				<div>
@@ -54,6 +59,19 @@
 								<button id="document-upload-button" class="btn btn-primary">
 									<span class="glyphicon glyphicon-upload"></span> Upload
 								</button>
+							</div>
+							<div id="assignmentDocuments">
+								<div class="row" th:if="${not #lists.isEmpty(assignmentsDocuments)}">
+								<h5>Assignment Documents :</h5>
+								<div class="col-md-6">
+									<ul class="list-group">
+										<li class="list-group-item list-group-item-info" th:each="documentDto : ${assignmentsDocuments}"><i class="fa fa-file-o" aria-hidden="true"></i>
+										<a th:href="@{'/teacher/downloadDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}" data-toggle="tooltip" data-placement="top" title="Download document" th:text="${documentDto.name}">document name</a> 
+										<a href="#" id="assignmentDocumentDelete" class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete document" ><span class="glyphicon glyphicon-trash"></span></a>
+										</li>
+									</ul>
+								</div>
+							</div>
 							</div>
 						</div>
 					</div>

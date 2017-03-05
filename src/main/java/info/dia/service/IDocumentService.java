@@ -12,4 +12,10 @@ public interface IDocumentService {
 	
 	List<Document> getAllDocumentsByAssignmenmt(Assignment assignment);
 	
+	Document findById(long id);
+	
+	Document getDocumentByIdAndAssignmentAndUser(Long id,Assignment assignment,Long userId);
+	
+	Document getDocumentByIdAndAssignmentIdAndUser(Long id,Long assignmentId,Long userId);
+	
 }

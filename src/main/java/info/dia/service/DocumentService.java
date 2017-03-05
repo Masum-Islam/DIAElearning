@@ -49,4 +49,19 @@ public class DocumentService implements IDocumentService {
 		return documentRepository.findAllByAssignment(assignment);
 	}
 
+	@Override
+	public Document findById(long id) {
+		return documentRepository.getOne(id);
+	}
+
+	@Override
+	public Document getDocumentByIdAndAssignmentAndUser(Long id, Assignment assignment, Long userId) {
+		return documentRepository.findByIdAndAssignmentAndUserId(id, assignment, userId);
+	}
+
+	@Override
+	public Document getDocumentByIdAndAssignmentIdAndUser(Long id, Long assignmentId, Long userId) {
+		return documentRepository.findByIdAndAssignmentIdAndUserId(id, assignmentId, userId);
+	}
+
 }

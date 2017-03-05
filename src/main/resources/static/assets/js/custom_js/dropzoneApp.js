@@ -100,8 +100,8 @@ $(document).ready(function() {
 
 			var myDropzone = this;
 			
-			/* //Call the action method to load the images from the server
-            $.getJSON("/teacher//assignmentDocuments.json/"+assignmentId).done(function (data) {
+			 //Call the action method to load the images from the server
+            /*$.getJSON("/teacher/assignmentDocuments.json/"+assignmentId).done(function (data) {
                 if (data.Data != '') {
                     $.each(data.Data, function (index, item) {
                             //// Create the mock file:
@@ -156,6 +156,7 @@ $(document).ready(function() {
 			
 			this.on("complete", function(file) {
 				this.removeFile(file);
+				retrieveAssignmentDocuments();
 			});
 			
 		}
@@ -180,6 +181,16 @@ $(document).ready(function() {
 
 		// from the library bootstrap-dialog.min.js
 		BootstrapDialog.show({title : '<b>Server Response</b>',message : responseContent});
+	}
+	
+	
+
+	function retrieveAssignmentDocuments() {
+		var url = '/teacher//assignmentDocuments';
+		if ($('#assignmentId').val() != '') {
+			url = url + '/' + $('#assignmentId').val();
+		}
+		$("#assignmentDocuments").load(url);
 	}
 	
 	function successMsg(msg){
