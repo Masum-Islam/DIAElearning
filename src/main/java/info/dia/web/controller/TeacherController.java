@@ -601,11 +601,12 @@ public class TeacherController {
 	}
 	
 	//Assignment Document Download
-	@PreAuthorize("hasAuthority('WRITE_PRIVILEGE')")
+	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
     @RequestMapping(value = "/downloadDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
     public void getFile(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
 
 		Authentication authentication = authenticationFacade.getAuthentication();
+		
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			
 			User assignmentUser = userService.findUserByEmail(authentication.getName());

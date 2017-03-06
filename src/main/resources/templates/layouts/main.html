@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en"
 	xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org">
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -11,7 +12,7 @@
 	    <link th:href="@{/assets/font-awesome/css/font-awesome.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/simple-line-icons/simple-line-icons.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
-        <link th:href="@{/assets/css/scrolling-nav.css}" rel="stylesheet">
+        <!-- <link th:href="@{/assets/css/scrolling-nav.css}" rel="stylesheet"> -->
         <link th:href="@{/assets/css/style.css}" rel="stylesheet" type="text/css" />
         
         <link th:href="@{/assets/css/animate.css}" rel="stylesheet" type="text/css" />
@@ -43,7 +44,7 @@
 	</style>
 
 </head>
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+<body  data-target=".navbar-fixed-top">
 		
 		
 		
@@ -64,18 +65,18 @@
                     <ul class="nav navbar-nav">
                         <li class="" th:class="${controllerName == 'Home'} ? 'dropdown active' : 'dropdown'"><a th:href="@{/home}">Home</a></li>
                         
-                        <li class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Student'} ? 'dropdown active' : 'dropdown'">
-					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Student<span class="caret"></span></a>
+                        <li sec:authorize="hasAuthority('STUDENT_PRIVILEGE')" class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Student'} ? 'dropdown active' : 'dropdown'">
+					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Assignment<span class="caret"></span></a>
 					            <ul class="dropdown-menu">
-					                <li><a th:href="@{/student/assignment}">My Assignment</a></li>
+					                <li><a th:href="@{/student/assignment}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>My Assignment</a></li>
 					                <!-- <li><a th:href="@{/authorizationDocumentUpload}">Authorization Document Upload</a></li>				                
 					                <li><a th:href="@{/answerUpload}">Answer Submission</a></li> -->
 					            </ul>
 					    </li>
 					    
 					    
-					    <li class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Teacher'} ? 'dropdown active' : 'dropdown'">
-					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Teacher<span class="caret"></span></a>
+					    <li sec:authorize="hasAuthority('TEACHER_PRIVILEGE')" class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Teacher'} ? 'dropdown active' : 'dropdown'">
+					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Assignment<span class="caret"></span></a>
 					            <ul class="dropdown-menu">
 					                <li><a th:href="@{/teacher/assignment}"><i class="fa fa-plus-circle"></i>Create Assignment</a></li>
 					                <li><a th:href="@{/teacher/assignments}"><i class="fa fa-eye"></i>View Assignments</a></li>
@@ -85,7 +86,7 @@
 					    </li>
 					    
 					    
-					    <li class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Admin'} ? 'dropdown active' : 'dropdown'">
+					    <li sec:authorize="hasAuthority('ADMIN_PRIVILEGE')" class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Admin'} ? 'dropdown active' : 'dropdown'">
 					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
 					            <ul class="dropdown-menu">
 					                <li><a th:href="@{/admin/allUsers}">All Users</a></li>
@@ -150,69 +151,12 @@
 
         <div class="container">
 
-           <!--  <div class="row row-offcanvas row-offcanvas-right">
-
-                <div class="col-xs-12 col-sm-9">
-                    <p class="pull-right visible-xs">
-                        <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
-                    </p>
-                    <div class="jumbotron">
-                        <h1>Hello, world!</h1>
-                        <p>This is an example to show the potential of an offcanvas layout pattern in Bootstrap. Try some responsive-range viewport sizes to see it in action.</p>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details »</a></p>
-                        </div>/.col-xs-6.col-lg-4
-                    </div>/row
-                </div>/.col-xs-12.col-sm-9
-
-                <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
-                    <div class="list-group">
-                        <a href="#" class="list-group-item active">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                        <a href="#" class="list-group-item">Link</a>
-                    </div>
-                </div>/.sidebar-offcanvas
-            </div> --><!--/row-->
+           	
 			
-			<div layout:fragment="content">
+		<div layout:fragment="content">
+
 			
-			</div>
+		</div>
 		
             
 

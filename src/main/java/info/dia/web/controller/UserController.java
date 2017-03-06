@@ -228,11 +228,7 @@ public class UserController {
             catch (Exception e) {
                 return new ResponseEntity<>("{}", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-    		
-    		
     	}
-        
-
         return new ResponseEntity<>("{}", HttpStatus.OK);
     }
     
@@ -268,24 +264,7 @@ public class UserController {
         return new ResponseEntity<byte[]> (avatarImage, headers, HttpStatus.CREATED);
         
     }
-    
-   /* //InputStreamResource
-  	@RequestMapping(value = "/user/avatar/image/{user}", method = RequestMethod.GET)
-  	@ResponseBody
-  	public ResponseEntity<ByteArrayResource> downloadLinkInage(@PathVariable Long imageId) {
-  	    BufferedImage image = (BufferedImage) service.getArticleImage(imageId);
 
-  	    byte[] bytes = getByteArrayFromImage(image, log);
-  	    ByteArrayResource bsr = new ByteArrayResource(bytes);
-  	    return ResponseEntity.ok()
-  	            .contentLength(bytes.length)
-  	            .contentType(MediaType.parseMediaType("image/png"))
-  	            .body(bsr);
-  	}
-*/
-    
-    
-    
     
     // ============== NON-API ============
     private SimpleMailMessage constructResendVerificationTokenEmail(final String contextPath, final Locale locale, final VerificationToken newToken, final User user) {

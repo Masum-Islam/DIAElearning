@@ -68,6 +68,12 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	}
 
 
+	@Override
+	public Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,Boolean status,Pageable pageable) {
+		return assignmentStudentRepository.findAllByEmailAndAssignmentStatus(email,status,pageable);
+	}
+
+
 	
 
 }
