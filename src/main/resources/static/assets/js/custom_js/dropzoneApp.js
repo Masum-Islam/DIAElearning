@@ -100,31 +100,6 @@ $(document).ready(function() {
 
 			var myDropzone = this;
 			
-			 //Call the action method to load the images from the server
-            /*$.getJSON("/teacher/assignmentDocuments.json/"+assignmentId).done(function (data) {
-                if (data.Data != '') {
-                    $.each(data.Data, function (index, item) {
-                            //// Create the mock file:
-                            var mockFile = {
-                                name: item.id,
-                                size: item.size
-                            };
-
-                            // Call the default addedfile event handler
-                            thisDropzone.emit("addedfile", mockFile);
-
-                            // And optionally show the thumbnail of the file:
-                            thisDropzone.emit("thumbnail", mockFile, item.name);
-
-                            // If you use the maxFiles option, make sure you adjust it to the
-                            // correct amount:
-                            //var existingFileCount = 1; // The number of files already uploaded
-                            //myDropzone.options.maxFiles = myDropzone.options.maxFiles - existingFileCount;
-                    });
-                }
-
-            });*/
-            
 
 			// first set autoProcessQueue = false
 			$('#document-upload-button').on("click", function(e) {
@@ -162,6 +137,65 @@ $(document).ready(function() {
 		}
 	}
 	
+	
+	
+	Dropzone.options.studentAssignmentDocumentDropzone  = {
+			
+			/*url : "/teacher/uploadAssignmentDocument?assignmentId="+assignmentId,*/
+			acceptedFiles: ".zip,.rar",
+			autoProcessQueue : false,
+			/*uploadMultiple : true,*/
+			maxFilesize : 25, // MB
+			/*parallelUploads : 100,*/
+			maxFiles : 1,
+			maxfilesexceeded: function(file) {
+		        this.removeAllFiles();
+		        this.addFile(file);
+		    },
+			addRemoveLinks : true,
+			previewsContainer : ".dropzone-previews",
+
+			// The setting up of the dropzone
+			init : function() {
+
+				var myDropzone = this;
+				
+
+				// first set autoProcessQueue = false
+				$('#student-document-upload-button').on("click", function(e) {
+
+					myDropzone.processQueue();
+					
+				});
+
+				// customizing the default progress bar
+				this.on("uploadprogress", function(file, progress) {
+
+					progress = parseFloat(progress).toFixed(0);
+
+					var progressBar = file.previewElement.getElementsByClassName("dz-upload")[0];
+					progressBar.innerHTML = progress + "%";
+					
+				});
+				
+				this.on("error", function(file, response) {
+	                // do stuff here.
+	                errorMsg(response);
+	            });
+				
+				// displaying the uploaded files information in a Bootstrap dialog
+				this.on("success", function(files, serverResponse) {
+					successMsg("Assignment Document Upload Successfully");
+					/*showInformationDialog(files, serverResponse);*/
+				});
+				
+				this.on("complete", function(file) {
+					this.removeFile(file);
+					retrieveStudentExistsAssignmentDocument();
+				});
+				
+			}
+		}
 
 	function showInformationDialog(files, objectArray) {
 
@@ -186,11 +220,21 @@ $(document).ready(function() {
 	
 
 	function retrieveAssignmentDocuments() {
-		var url = '/teacher//assignmentDocuments';
+		var url = '/teacher/assignmentDocuments';
 		if ($('#assignmentId').val() != '') {
 			url = url + '/' + $('#assignmentId').val();
 		}
 		$("#assignmentDocuments").load(url);
+	}
+	
+	function retrieveStudentExistsAssignmentDocument() {
+		
+		var url = '/student/assignmentDocument';
+		if ($('#assignmentId').val() != '') {
+			url = url + '/' + $('#assignmentId').val();
+		}
+		$("#studentAssignmentDocument").load(url);
+		/*location.reload(true);*/
 	}
 	
 	function successMsg(msg){

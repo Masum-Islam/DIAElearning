@@ -237,7 +237,7 @@ public class TeacherController {
 	}
 	
 	
-	@RequestMapping(value = "/uploadAssignmentDocument", method = RequestMethod.POST)
+	  @RequestMapping(value = "/uploadAssignmentDocument", method = RequestMethod.POST)
 	  public @ResponseBody List<DocumentDto> upload(MultipartHttpServletRequest request,HttpServletResponse response,@RequestParam(value="assignmentId") Long assignmentId) throws IOException {
 
 		Authentication authentication = authenticationFacade.getAuthentication();
@@ -803,6 +803,7 @@ public class TeacherController {
 		    fileInfo.setLocation(getDestinationLocation(user));
 		    fileInfo.setUserId(user.getId());
 		    fileInfo.setAssignmentId(assignmentId);
+		    fileInfo.setStatus(1);  // Status = 1, teacher assignment related document
 		    
 		    return fileInfo;
 	}

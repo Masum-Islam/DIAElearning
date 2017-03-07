@@ -74,6 +74,12 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	}
 
 
+	@Override
+	public AssignmentStudent saveOrUpdate(AssignmentStudent assignmentStudent) {
+		return assignmentStudentRepository.saveAndFlush(assignmentStudent);
+	}
+
+
 	
 
 }

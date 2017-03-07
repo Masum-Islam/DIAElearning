@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+</head>
+<body>
+	<div th:fragment="studentAssignmentDocument">
+
+		<div class="row" th:if="${document !=null}">
+			<h5>Assignment Document :</h5>
+			<div class="col-md-6">
+				<ul class="list-group">
+					<li class="list-group-item list-group-item-info" th:text="${document.name}">
+					<i	class="fa fa-file-o" aria-hidden="true"></i> 
+					<!-- <a th:href="@{'/teacher/downloadDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}" data-toggle="tooltip" data-placement="top" title="Download document" th:text="${documentDto.name}">document name</a> 
+					<a href="#" class="btn btn-icon-only red" data-toggle="tooltip"	data-placement="top" title="Delete document"><span	class="glyphicon glyphicon-trash"></span></a> -->
+					</li>
+				</ul>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

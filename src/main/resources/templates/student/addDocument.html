@@ -5,7 +5,7 @@
 	layout:decorator="layouts/main">
 <head>
 <meta charset="ISO-8859-1">
-<title th:text="#{label.pages.teacher.assignment.document}">Title</title>
+<title th:text="#{label.pages.student.assignment.document}">Title</title>
 </head>
 <body>
 
@@ -13,8 +13,8 @@
 		
 		
 	</th:block>
-
-<div layout:fragment="content">
+	
+	<div layout:fragment="content">
 	<div class="page-content-inner">
 			<div class="row">
 				<div>
@@ -32,7 +32,7 @@
 										class="fa fa-angle-down"></i>
 									</a>
 									<ul class="dropdown-menu pull-right">
-										<li><a th:href="@{/teacher/assignments}"> <i class="fa fa-eye"></i>View Assignments</a></li>
+										<li><a th:href="@{/student/assignment}"> <i class="fa fa-eye"></i>My Assignments</a></li>
 									</ul>
 								</div>
 							</div>
@@ -40,9 +40,13 @@
 
 						<div class="portlet-body form">
 							<span class="label label-danger">Maximum file size is 25MB</span>
-
-							<form id="assignment-document-dropzone" class="dropzone"	th:object="${assignmentDocument}" th:action="@{/teacher/uploadAssignmentDocument/(assignmentId=${assignmentDocument.assignmentId})}" enctype="multipart/form-data">
+							<!--  -->
+							<form id="student-assignment-document-dropzone" class="dropzone"	th:object="${studentDocumentDto}" th:action="@{/student/uploadStudentAssignmentDocument(assignmentId=${studentDocumentDto.assignmentId},assignmentStudentId=${studentDocumentDto.assignmentStudentId},id=${studentDocumentDto.id})}"  enctype="multipart/form-data">
+								
+								<input type="hidden" id="assignmentStudentId" th:field="*{assignmentStudentId}" />
 								<input type="hidden" id="assignmentId" th:field="*{assignmentId}" />
+								<input type="hidden" id="id" th:field="*{id}" />
+								
 								<div
 									class="dz-default dz-message file-dropzone text-center well col-sm-12">
 
@@ -56,22 +60,23 @@
 							</form>
 							<hr />
 							<div th:style="'text-align:right'">
-								<button id="document-upload-button" class="btn btn-primary">
+								<button id="student-document-upload-button" class="btn btn-primary">
 									<span class="glyphicon glyphicon-upload"></span> Upload
 								</button>
 							</div>
-							<div id="assignmentDocuments">
-								<div class="row" th:if="${not #lists.isEmpty(assignmentsDocuments)}">
-								<h5>Assignment Documents :</h5>
+							<div id="studentAssignmentDocument">
+								<div th:if="${document !=null}">
+								<h5>Assignment Document :</h5>
 								<div class="col-md-6">
 									<ul class="list-group">
-										<li class="list-group-item list-group-item-info" th:each="documentDto : ${assignmentsDocuments}"><i class="fa fa-file-o" aria-hidden="true"></i>
-										<a th:href="@{'/teacher/downloadDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}" data-toggle="tooltip" data-placement="top" title="Download document" th:text="${documentDto.name}">document name</a> 
-										<a href="#" id="assignmentDocumentDelete" class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete document" ><span class="glyphicon glyphicon-trash"></span></a>
+										<li class="list-group-item list-group-item-info" th:text="${document.name}">
+										<i class="fa fa-file-o"	aria-hidden="true"></i>
+											 <!-- <a th:href="@{'/teacher/downloadDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}" data-toggle="tooltip" data-placement="top" title="Download document" th:text="${documentDto.name}">document name</a> 
+											<a href="#" class="btn btn-icon-only red" data-toggle="tooltip"	data-placement="top" title="Delete document"><span	class="glyphicon glyphicon-trash"></span></a> -->
 										</li>
 									</ul>
 								</div>
-							</div>
+								</div>
 							</div>
 						</div>
 					</div>

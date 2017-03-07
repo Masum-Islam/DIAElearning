@@ -77,9 +77,8 @@
 										
 										<td data-title="Last Date Of Submission" th:text="${assignmentStudent.submitEndDate} ? ${#calendars.format(assignmentStudent.submitEndDate,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
 
-										<!-- <td>Time Remains</td> -->
 										<td data-title="Actions" >
-											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File To Assignment" href="#"><span class="fa fa-file"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File To Assignment" th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}"><span class="fa fa-file"></span></a>
 										</td>
 									</tr>
 								</tbody>

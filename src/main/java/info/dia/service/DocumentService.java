@@ -9,10 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import info.dia.persistence.dao.AssignmentRepository;
+import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.dao.DocumentRepository;
 import info.dia.persistence.model.Assignment;
+import info.dia.persistence.model.AssignmentStudent;
 import info.dia.persistence.model.Document;
 import info.dia.web.dto.DocumentDto;
+import info.dia.web.dto.StudentDocumentDto;
 
 @Service
 @Transactional
@@ -23,6 +26,9 @@ public class DocumentService implements IDocumentService {
 	
 	@Autowired
 	private AssignmentRepository assignmentRepository;
+	
+	@Autowired
+	private AssignmentStudentRepository assignmentStudentRepository;
 
 	@Override
 	public Document saveOrUpdate(DocumentDto documentDto) {
@@ -62,6 +68,79 @@ public class DocumentService implements IDocumentService {
 	@Override
 	public Document getDocumentByIdAndAssignmentIdAndUser(Long id, Long assignmentId, Long userId) {
 		return documentRepository.findByIdAndAssignmentIdAndUserId(id, assignmentId, userId);
+	}
+
+	@Override
+	public Document saveStudentDocument(StudentDocumentDto studentDocumentDto) {
+		
+		Document document = null;
+		if (studentDocumentDto.getId()!=null) {
+			
+			document = documentRepository.findOne(studentDocumentDto.getId());
+			
+			document.setName(studentDocumentDto.getName());
+			document.setLocation(studentDocumentDto.getLocation());
+			document.setSize(studentDocumentDto.getSize());
+			document.setStatus(studentDocumentDto.getStatus());
+			document.setType(studentDocumentDto.getType());
+			document.setUserId(studentDocumentDto.getUserId());
+			document.setCreateOn(new Date());
+			Assignment assignment = assignmentRepository.findOne(studentDocumentDto.getAssignmentId());
+			document.setAssignment(assignment);
+			
+		}else {
+			
+			document = documentRepository.findByAssignmentIdAndUserId(studentDocumentDto.getAssignmentId(),studentDocumentDto.getUserId());
+			if (document!=null) {
+				
+				document.setName(studentDocumentDto.getName());
+				document.setLocation(studentDocumentDto.getLocation());
+				document.setSize(studentDocumentDto.getSize());
+				document.setStatus(studentDocumentDto.getStatus());
+				document.setType(studentDocumentDto.getType());
+				document.setUserId(studentDocumentDto.getUserId());
+				document.setCreateOn(new Date());
+				
+				Assignment assignment = assignmentRepository.findOne(studentDocumentDto.getAssignmentId());
+				document.setAssignment(assignment);
+				
+			}else {
+				
+				document = new Document();
+				
+				document.setName(studentDocumentDto.getName());
+				document.setLocation(studentDocumentDto.getLocation());
+				document.setSize(studentDocumentDto.getSize());
+				document.setStatus(studentDocumentDto.getStatus());
+				document.setType(studentDocumentDto.getType());
+				document.setUserId(studentDocumentDto.getUserId());
+				document.setCreateOn(new Date());
+				
+				Assignment assignment = assignmentRepository.findOne(studentDocumentDto.getAssignmentId());
+				document.setAssignment(assignment);
+				
+			}
+			
+			
+			
+		}
+		
+		
+		
+		
+		AssignmentStudent assignmentStudent = assignmentStudentRepository.findOne(studentDocumentDto.getAssignmentStudentId());
+		assignmentStudent.setStatus(true);
+		assignmentStudent.setSubmitDate(new Date());
+		
+		assignmentStudentRepository.saveAndFlush(assignmentStudent);
+		
+		
+		return documentRepository.save(document);
+	}
+
+	@Override
+	public Document getDocumentByAssignmentIdAndUserId(Long assignmentId, Long userId) {
+		return documentRepository.findByAssignmentIdAndUserId(assignmentId, userId);
 	}
 
 }
