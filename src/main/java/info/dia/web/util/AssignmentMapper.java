@@ -3,6 +3,9 @@ package info.dia.web.util;
 import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
 import info.dia.web.dto.AssignmentInfoDto;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +27,14 @@ public class AssignmentMapper {
         infoDto.setStatus(assignment.getStatus());
 
         if (assignment.getAssignmentStudents().size()>0){
+        	
             infoDto.setTotalNumberOfStudent(assignment.getAssignmentStudents().size());
 
             int count=0;
 
             for (AssignmentStudent a: assignment.getAssignmentStudents() ) {
-                if (a.isStatus()==true){
-                    count += count;
+                if (a.isStatus()){
+                    count ++;
                 }
             }
             infoDto.setTotalNumberOfSubmittedStudent(count);

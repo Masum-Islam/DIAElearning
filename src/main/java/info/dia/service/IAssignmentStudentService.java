@@ -18,5 +18,7 @@ public interface IAssignmentStudentService {
 	Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,Boolean status,Pageable pageable);
 	
 	AssignmentStudent saveOrUpdate(AssignmentStudent assignmentStudent);
+	
+	AssignmentStudent getAssignmentStudentByEmailAndAssignmentId(String email,Long assignmentId);
 
 }

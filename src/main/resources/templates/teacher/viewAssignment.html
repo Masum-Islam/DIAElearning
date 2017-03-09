@@ -31,8 +31,11 @@
 				});
 			}
 			
+			// Edit Student Assignment
 			$(document).ready(function() {
+				
 			   var tableControl= document.getElementById('allAssignmentStudentTable');
+			   
 			   var assignmentId = $( "#assignmentId" ).val();
 			   console.log("AssignmentId :"+assignmentId);
 			   
@@ -59,6 +62,34 @@
 			    	    });
 			    });
 			});
+			
+			// Download Student Assignment
+			 $(document).ready(function() {
+				
+				   var tableControl= document.getElementById('allAssignmentStudentTable');
+				   
+				   var assignmentId = $( "#assignmentId" ).val();
+				   console.log("AssignmentId :"+assignmentId);
+				   
+				   var emails = [];
+				   
+				   var ajaxURL = "/teacher/downloadStudentsAssignmentDocuments";
+				   
+				    $('#downloadStudentAssignmentDocument').click(function() {
+				    	 	
+				    		$('input:checkbox:checked', tableControl).each(function() {
+				    			emails.push($(this).closest('tr').find('td.email').text());
+					        }).get();
+				    	 	console.log(emails);
+				    	 	$.get(ajaxURL+"?assignmentId="+assignmentId+"&emails[]="+emails,function(){
+				    	 		alert("Success");
+				    	    	console.log(emails);
+				    	    }).fail(function() {
+				    	    	errorMsg("Please select an email");
+				    	    });
+				    });
+				});
+			
 		</script>
 		
 		
@@ -152,10 +183,9 @@
 										<th>
 										<span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span>
 										</th>
-										<!-- <th>Time Remains</th> -->
-										<!-- <th width="12%">
-										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
-										</th> -->
+										<th width="4%">
+											<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
+										</th>
 									</tr>
 								</thead>
 								<tbody th:if="${not #lists.isEmpty(assignmentStudentInfos)}">
@@ -163,7 +193,8 @@
 										<!-- <td th:text="${rowStat.count}">1</td> -->
 										<td><input type="checkbox" id="td_Checkbox" /></td>
 										<td class="assignmentStudentId" style="display:none;" th:text="${assignmentStudentInfo.assignmentStudentId}"></td>
-										<td data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
+										<td class="assignmentId" style="display:none;" th:text="${assignmentStudentInfo.assignmentId}"></td>
+										<td class="email" data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
 										
 										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == true">Submitted</td>
 										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == false">Not Submitted</td>
@@ -172,15 +203,9 @@
 										
 										<td data-title="Last Date Of Submission" th:text="${assignmentStudentInfo.lastDateOfSubmission} ? ${#calendars.format(assignmentStudentInfo.lastDateOfSubmission,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
 										
-										
-										
-
-										<!-- <td>Time Remains</td> -->
-										<!-- <td data-title="Actions" >
-											<a class="btn btn-icon-only green" data-toggle="tooltip" data-placement="top" title="Edit"  href="#"><span class="glyphicon glyphicon-pencil"></span></a>
-											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download" href="#"><span class="fa fa-download"></span></a>
-											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-										</td> -->
+										<td data-title="Actions" >
+											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " th:href="@{/teacher/downloadStudentAssignmentDocument(email=${assignmentStudentInfo.email},assignmentId=${assignmentStudentInfo.assignmentId})}"><span class="fa fa-download"></span></a>
+										</td>
 										
 									</tr>
 								</tbody>

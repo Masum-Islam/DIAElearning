@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import info.dia.service.IDocumentService;
 import info.dia.service.IUserService;
 import info.dia.web.dto.DocumentDto;
 import info.dia.web.dto.StudentDocumentDto;
+import info.dia.web.error.AssignmentDateTimeException;
 import info.dia.web.util.DocumentMapper;
 import info.dia.web.util.HelperUtils;
 
@@ -162,6 +164,11 @@ public class StudentController {
 
 			User user = userService.findUserByEmail(authentication.getName());
 			
+			boolean assignmentDateTimeExpiredOrNot = assignmentDateExpiredOrNot(user.getEmail(),assignmentId);
+			if (assignmentDateTimeExpiredOrNot) {
+				throw new AssignmentDateTimeException("Assignment submission date expired--->"+user.getEmail());
+			}
+			
 			// Getting uploaded files from the request object
 			Map<String, MultipartFile> fileMap = request.getFileMap();
 
@@ -243,6 +250,24 @@ public class StudentController {
 		}
 
 		return file.getAbsolutePath();
+	}
+	
+	
+	private boolean assignmentDateExpiredOrNot(String email,long assignmentId){
+		
+		boolean assignmentDateTimeExpiredOrNot = false;
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		
+		AssignmentStudent assignmentStudent  = assignmentStudentService.getAssignmentStudentByEmailAndAssignmentId(email,assignmentId);
+		LOGGER.info("assignmentStudent :"+assignmentStudent.getEmail()+" assignmentStudentId :"+assignmentStudent.getId()+" And assignmentId :"+assignmentStudent.getAssignment().getId());
+		LOGGER.info("Assignment DateTime Expired Or Not: "+calendar.getTime().before(assignmentStudent.getSubmitEndDate())+ "Date :"+calendar.getTime()+"---->"+assignmentStudent.getSubmitEndDate());
+		if (calendar.getTime().after(assignmentStudent.getSubmitEndDate())) {
+			assignmentDateTimeExpiredOrNot = true;
+		}
+		
+		return assignmentDateTimeExpiredOrNot;
 	}
 	
 

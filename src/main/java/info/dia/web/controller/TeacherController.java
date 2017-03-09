@@ -1,10 +1,13 @@
 package info.dia.web.controller;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,12 +18,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +59,6 @@ import info.dia.persistence.model.Document;
 import info.dia.persistence.model.Group;
 import info.dia.persistence.model.GroupDetails;
 import info.dia.persistence.model.User;
-import info.dia.service.DocumentService;
 import info.dia.service.IAssignmentService;
 import info.dia.service.IAssignmentStudentService;
 import info.dia.service.IDocumentService;
@@ -600,10 +605,10 @@ public class TeacherController {
     	return "teacher/assignmentDocuments :: assignmentDocuments";
 	}
 	
-	//Assignment Document Download
+	//Assignment reference Document Download
 	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
-    @RequestMapping(value = "/downloadDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
-    public void getFile(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
+    @RequestMapping(value = "/downloadAssignmentReferenceDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
+    public void downloadAssignmentReferenceDocument(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
 
 		Authentication authentication = authenticationFacade.getAuthentication();
 		
@@ -625,6 +630,81 @@ public class TeacherController {
 			}
 		}
     }
+	
+	
+	//Student Assignment Document Download
+	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	@RequestMapping(value = "/downloadStudentAssignmentDocument",method = RequestMethod.GET,produces="application/zip")
+	public void downloadStudentAssignmentDocument(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam String email) {
+
+		
+		User studentUser = userService.findUserByEmail(email);
+		LOGGER.info("AssignmentId: "+assignmentId+" And Eamil :"+email);
+		Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId,studentUser.getId());
+		if (dataFile!=null) {
+			LOGGER.info("dataFile :"+dataFile.getLocation()+"--->"+dataFile.getName());
+			File file = new File(dataFile.getLocation(), dataFile.getName());
+			try {
+				response.setContentType(dataFile.getType());
+				response.setHeader("Content-disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
+				FileCopyUtils.copy(FileUtils.readFileToByteArray(file), response.getOutputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}			
+	 }
+		
+	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	@RequestMapping(value = "/downloadStudentsAssignmentDocuments",method = RequestMethod.GET,produces="application/zip")
+	public byte[] downloadStudentsAssignmentDocuments(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam(value = "emails[]") String[] emails) throws IOException {
+		
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");
+        
+        //creating byteArray stream, make it bufforable and passing this buffor to ZipOutputStream
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+        ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+        
+        //Create List of Files
+        ArrayList<File> files = new ArrayList<>();
+        files.clear();
+        
+		if (emails != null) {
+			for (String email : emails) {
+				User studentUser = userService.findUserByEmail(email);
+				Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId, studentUser.getId());
+				if (dataFile != null) {
+					File file = new File(dataFile.getLocation(), dataFile.getName());
+					files.add(file);
+				}
+			}
+		}
+		
+		//packing files
+        for (File file : files) {
+            //new zip entry and copying inputstream with file to zipOutputStream, after all closing streams
+				zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+				FileInputStream fileInputStream = new FileInputStream(file);
+	            IOUtils.copy(fileInputStream, zipOutputStream);
+	            fileInputStream.close();
+	            zipOutputStream.closeEntry();
+        }
+
+        if (zipOutputStream != null) {
+				zipOutputStream.finish();
+				zipOutputStream.flush();
+	            IOUtils.closeQuietly(zipOutputStream);
+        }
+        IOUtils.closeQuietly(bufferedOutputStream);
+        IOUtils.closeQuietly(byteArrayOutputStream);
+		
+        OutputStream outputStream = response.getOutputStream();
+        
+        return byteArrayOutputStream.toByteArray();
+        /*FileCopyUtils.copy(byteArrayOutputStream.toByteArray(),response.getOutputStream());*/
+		
+	 }
 	
 	
 	/* End Assignment Related Methods*/
@@ -695,7 +775,7 @@ public class TeacherController {
        	
        	Group group = groupService.getByGroupId(id);
        	
-       	LOGGER.info("Group :"+group);
+       	/*LOGGER.info("Group :"+group);*/
        	
        	List<GroupDetails> groupDetails = new ArrayList<>();
        	
@@ -750,7 +830,7 @@ public class TeacherController {
     	
     	for (AssignmentStudentInfo assignmentStudentInfo : assignmentStudents) {
 			if (assignmentStudentInfo.getStatus()==true) {
-				count +=count;
+				count ++;
 			}
 		}
     	 return count;

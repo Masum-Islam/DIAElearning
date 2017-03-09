@@ -41,15 +41,23 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         logger.error("400 Status Code", ex);
         final BindingResult result = ex.getBindingResult();
         final GenericResponse bodyOfResponse = new GenericResponse(result.getFieldErrors(), result.getGlobalErrors());
-        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(),HttpStatus.BAD_REQUEST, request);
     }
 
-    @ExceptionHandler({ InvalidOldPasswordException.class })
+    @ExceptionHandler({InvalidOldPasswordException.class })
     public ResponseEntity<Object> handleInvalidOldPassword(final RuntimeException ex, final WebRequest request) {
         logger.error("400 Status Code", ex);
         final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.invalidOldPassword", null, request.getLocale()), "InvalidOldPassword");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
+    
+    @ExceptionHandler({AssignmentDateTimeException.class })
+    public ResponseEntity<Object> handleAssignmentDateTimeExpire(final RuntimeException ex, final WebRequest request) {
+        logger.error("400 Status Code", ex);
+        final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.assignmentDateTimeExpired", null, request.getLocale()), "AssignmentDateTimeExpired");
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(),HttpStatus.BAD_REQUEST, request);
+    }
+    
 
    /* @ExceptionHandler({ ReCaptchaInvalidException.class })
     public ResponseEntity<Object> handleReCaptchaInvalid(final RuntimeException ex, final WebRequest request) {
@@ -73,6 +81,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.regError", null, request.getLocale()), "UserAlreadyExist");
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
+    
+    
     
     // 409
     @ExceptionHandler({GroupNameAlreadyExistsException.class })

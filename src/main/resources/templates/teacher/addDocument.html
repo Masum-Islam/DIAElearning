@@ -55,23 +55,36 @@
 								<div class="dropzone-previews"></div>
 							</form>
 							<hr />
-							<div th:style="'text-align:right'">
-								<button id="document-upload-button" class="btn btn-primary">
-									<span class="glyphicon glyphicon-upload"></span> Upload
-								</button>
-							</div>
-							<div id="assignmentDocuments">
-								<div class="row" th:if="${not #lists.isEmpty(assignmentsDocuments)}">
-								<h5>Assignment Documents :</h5>
-								<div class="col-md-6">
-									<ul class="list-group">
-										<li class="list-group-item list-group-item-info" th:each="documentDto : ${assignmentsDocuments}"><i class="fa fa-file-o" aria-hidden="true"></i>
-										<a th:href="@{'/teacher/downloadDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}" data-toggle="tooltip" data-placement="top" title="Download document" th:text="${documentDto.name}">document name</a> 
-										<a href="#" id="assignmentDocumentDelete" class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Delete document" ><span class="glyphicon glyphicon-trash"></span></a>
-										</li>
-									</ul>
+							<div class="row">
+								
+								<div class="col-md-8" id="assignmentDocuments">
+									<div th:if="${not #lists.isEmpty(assignmentsDocuments)}">
+										<h5>Assignment Documents :</h5>
+										<div>
+											<ul class="list-group">
+											<li class="list-group-item list-group-item-info clearfix" th:each="documentDto : ${assignmentsDocuments}">
+												<span class="glyphicon glyphicon-file"></span>
+												<span th:text="${documentDto.name}"></span>
+												<span class="pull-right">
+													<a	th:href="@{'/teacher/downloadAssignmentReferenceDocument/'}+${documentDto.id}+'/'+${documentDto.assignmentId}"	data-toggle="tooltip" data-placement="top"	title="Download document">
+														<span class="fa fa-download"></span>
+													</a> 
+													<a href="#" id="assignmentDocumentDelete" class="btn btn-xs btn-warning" data-toggle="tooltip"	data-placement="top" title="Delete document">
+														<span class="glyphicon glyphicon-trash"></span>
+													</a>
+												</span> 
+											</li>
+											</ul>
+										</div>
+									</div>
 								</div>
-							</div>
+								
+								<div class="col-md-4" th:style="'text-align:right'">
+									<button id="document-upload-button" class="btn btn-primary">
+										<span class="glyphicon glyphicon-upload"></span> Upload
+									</button>
+								</div>
+								
 							</div>
 						</div>
 					</div>
