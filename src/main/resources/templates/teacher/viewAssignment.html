@@ -67,26 +67,33 @@
 			 $(document).ready(function() {
 				
 				   var tableControl= document.getElementById('allAssignmentStudentTable');
-				   
 				   var assignmentId = $( "#assignmentId" ).val();
-				   console.log("AssignmentId :"+assignmentId);
-				   
-				   var emails = [];
-				   
 				   var ajaxURL = "/teacher/downloadStudentsAssignmentDocuments";
 				   
-				    $('#downloadStudentAssignmentDocument').click(function() {
-				    	 	
+				    $('#downloadStudentAssignmentDocument').click(function(e) {
+				    		e.preventDefault();
+				    		var emails = [];
+				    		 
 				    		$('input:checkbox:checked', tableControl).each(function() {
 				    			emails.push($(this).closest('tr').find('td.email').text());
 					        }).get();
-				    	 	console.log(emails);
-				    	 	$.get(ajaxURL+"?assignmentId="+assignmentId+"&emails[]="+emails,function(){
-				    	 		alert("Success");
-				    	    	console.log(emails);
-				    	    }).fail(function() {
-				    	    	errorMsg("Please select an email");
-				    	    });
+				    		
+				    		$.ajax({
+				    		    type : "GET",
+				    		    url : ajaxURL,
+				    		    data : {            
+				    		           "assignmentId": assignmentId,
+				    		           "emails[]": emails
+				    		    },
+				    		    success : function(response) {
+				    		    	window.location.href="/teacher/downloadStudentsAssignmentDocuments?assignmentId="+assignmentId+"&emails[]="+emails;
+				    		    },complete: function() {
+				    		    	
+				    	        },error : function(e) {
+				    		       alert('Error: ' + e);
+				    		    }
+				    		}); 
+				    	 	
 				    });
 				});
 			

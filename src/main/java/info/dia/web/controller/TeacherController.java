@@ -34,6 +34,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -655,22 +656,24 @@ public class TeacherController {
 	 }
 		
 	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
-	@RequestMapping(value = "/downloadStudentsAssignmentDocuments",method = RequestMethod.GET,produces="application/zip")
-	public byte[] downloadStudentsAssignmentDocuments(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam(value = "emails[]") String[] emails) throws IOException {
+	@RequestMapping(value = "/downloadStudentsAssignmentDocuments", produces="application/zip")
+	@ResponseBody
+	public byte[] downloadStudentsAssignmentDocuments(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam(value = "emails[]",required = false) String[] emails) throws IOException {
 		
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");
-        
+		Assignment assignment = assignmentService.getAssignmentById(assignmentId);
+
+		response.setStatus(HttpServletResponse.SC_OK);
+        /*response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");*/
+		response.setHeader("Content-disposition", "attachment; filename=\""+assignment.getTitle()+".zip"+"\"");
+		
         //creating byteArray stream, make it bufforable and passing this buffor to ZipOutputStream
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
         ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-        
-        //Create List of Files
+
+        //simple file list, just for tests
         ArrayList<File> files = new ArrayList<>();
-        files.clear();
-        
-		if (emails != null) {
+        if (emails != null) {
 			for (String email : emails) {
 				User studentUser = userService.findUserByEmail(email);
 				Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId, studentUser.getId());
@@ -680,33 +683,30 @@ public class TeacherController {
 				}
 			}
 		}
-		
-		//packing files
-        for (File file : files) {
-            //new zip entry and copying inputstream with file to zipOutputStream, after all closing streams
-				zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
-				FileInputStream fileInputStream = new FileInputStream(file);
-	            IOUtils.copy(fileInputStream, zipOutputStream);
-	            fileInputStream.close();
-	            zipOutputStream.closeEntry();
-        }
+        
+        
+        //packing files
+        if (files.size()>0) {
+        	for (File file : files) {
+                //new zip entry and copying inputstream with file to zipOutputStream, after all closing streams
+                zipOutputStream.putNextEntry(new ZipEntry(file.getName()));
+                FileInputStream fileInputStream = new FileInputStream(file);
 
+                IOUtils.copy(fileInputStream, zipOutputStream);
+
+                fileInputStream.close();
+                zipOutputStream.closeEntry();
+            }
+		}
         if (zipOutputStream != null) {
-				zipOutputStream.finish();
-				zipOutputStream.flush();
-	            IOUtils.closeQuietly(zipOutputStream);
+            zipOutputStream.finish();
+            zipOutputStream.flush();
+            IOUtils.closeQuietly(zipOutputStream);
         }
         IOUtils.closeQuietly(bufferedOutputStream);
         IOUtils.closeQuietly(byteArrayOutputStream);
-		
-        OutputStream outputStream = response.getOutputStream();
-        
         return byteArrayOutputStream.toByteArray();
-        /*FileCopyUtils.copy(byteArrayOutputStream.toByteArray(),response.getOutputStream());*/
-		
 	 }
-	
-	
 	/* End Assignment Related Methods*/
 	
 	
