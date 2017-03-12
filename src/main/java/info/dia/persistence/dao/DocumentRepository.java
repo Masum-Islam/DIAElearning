@@ -11,6 +11,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
 	List<Document> findAllByAssignment(Assignment assignment);
 	
+	List<Document> findAllByUserIdAndAssignmentIdAndStatus(Long userId,Long assignmentId,int status);
+	
 	Document findByIdAndAssignmentAndUserId(Long id,Assignment assignment,Long userId);
 	
 	Document findByIdAndAssignmentIdAndUserId(Long id,Long assignmentId,Long userId);

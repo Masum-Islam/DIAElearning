@@ -137,10 +137,10 @@
 											<td data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
 
 											<td data-title="Assignment Status"
-												th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"
+												th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-danger'"
 												th:if="${assignmentStudentInfo.status} == true">Submitted</td>
 											<td data-title="Assignment Status"
-												th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"
+												th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-danger'"
 												th:if="${assignmentStudentInfo.status} == false">Not
 												Submitted</td>
 

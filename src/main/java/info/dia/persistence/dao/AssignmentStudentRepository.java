@@ -18,4 +18,6 @@ public interface AssignmentStudentRepository extends JpaRepository<AssignmentStu
 	
 	AssignmentStudent findByEmailAndAssignmentId(String email,Long assignmentId);
 	
+	AssignmentStudent findByIdAndEmail(Long assignmentStudentId,String email);
+	
 }

@@ -86,6 +86,12 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	}
 
 
+	@Override
+	public AssignmentStudent getAssignmentStudentByIdAndEmail(Long assignmentStudentId, String email) {
+		return assignmentStudentRepository.findByIdAndEmail(assignmentStudentId, email);
+	}
+
+
 	
 
 }

@@ -20,5 +20,7 @@ public interface IAssignmentStudentService {
 	AssignmentStudent saveOrUpdate(AssignmentStudent assignmentStudent);
 	
 	AssignmentStudent getAssignmentStudentByEmailAndAssignmentId(String email,Long assignmentId);
+	
+	AssignmentStudent getAssignmentStudentByIdAndEmail(Long assignmentStudentId,String email);
 
 }

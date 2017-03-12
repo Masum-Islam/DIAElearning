@@ -92,26 +92,35 @@ public class AssignmentService implements IAssignmentService{
         			
         			for (String email : emailList) {
         				
-        				AssignmentStudent assignmentStudent = new AssignmentStudent();
-        				
-        				assignmentStudent.setAssignment(assignment);
-        				assignmentStudent.setEmail(email);
-        				
-        				User user = userService.findUserByEmail(email);
-						if (user!=null) {
-							sendEmailUserList.add(user);
+        				AssignmentStudent existsAssignmentStudent = assignmentStudentRepository.findByEmailAndAssignmentId(email,assignmentDto.getId()); 
+        				if (existsAssignmentStudent!=null) {
+        					
+        					assignmentStudents.add(existsAssignmentStudent);
+        					
+						}else {
+							
+							AssignmentStudent assignmentStudent = new AssignmentStudent();
+	        				
+	        				assignmentStudent.setAssignment(assignment);
+	        				assignmentStudent.setEmail(email);
+	        				
+	        				User user = userService.findUserByEmail(email);
+							if (user!=null) {
+								sendEmailUserList.add(user);
+							}
+							
+	        				assignmentStudent.setSubmitStartDate(assignmentDto.getSubmitStartDate());
+	        				assignmentStudent.setSubmitEndDate(assignmentDto.getSubmitEndDate());
+	        				
+	        				AssignmentStudent student = assignmentStudentRepository.findByEmailAndAssignment(email, assignment);
+	        				if (student!=null) {
+	        					assignmentStudent.setId(student.getId());
+	    					}
+	        				
+	        				assignmentStudents.add(assignmentStudent);
 						}
-						
-        				assignmentStudent.setSubmitStartDate(assignmentDto.getSubmitStartDate());
-        				assignmentStudent.setSubmitEndDate(assignmentDto.getSubmitEndDate());
         				
-        				AssignmentStudent student = assignmentStudentRepository.findByEmailAndAssignment(email, assignment);
-        				if (student!=null) {
-        					assignmentStudent.setId(student.getId());
-    					}
-        				assignmentStudents.add(assignmentStudent);
     				}
-        			
     			}
     			
     			Set<AssignmentStudent>  deletedAssignmentStudents= new HashSet<AssignmentStudent>();

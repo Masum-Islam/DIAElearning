@@ -65,8 +65,10 @@ public class MySimpleUrlAuthenticationSuccessHandler implements AuthenticationSu
     }
 
     protected String determineTargetUrl(final Authentication authentication) {
-        boolean isUser = false;
+        
+    	boolean isUser = false;
         boolean isAdmin = false;
+        
         final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         
         for (final GrantedAuthority grantedAuthority : authorities) {

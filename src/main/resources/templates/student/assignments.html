@@ -3,36 +3,24 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
 	layout:decorator="layouts/main">
-	
 <head>
 <meta charset="ISO-8859-1">
-<title th:text="#{label.pages.teacher.assignmentList}">Title</title>
+<title th:text="#{label.pages.student.assignments}">Title</title>
 </head>
 <body>
-		<th:block layout:fragment="script">
-
+	<th:block layout:fragment="script">
 		<link th:href="@{/assets/css/tableResponsive.css}" rel="stylesheet" type="text/css" />
-		<script th:src="@{/assets/js/custom_js/pagination.js}"></script>
-
-		<script>
-       
-			/* $('.selectpicker').selectpicker({
-				style : 'btn-info',
-			}); */
-			
-		</script>
-       </th:block>
-       
-<div layout:fragment="content" id="content">
-       
-       <div class="page-content-inner">
+	</th:block>
+	<div layout:fragment="content">
+		
+		<div class="page-content-inner">
 			<div class="row">
 					<!-- BEGIN SAMPLE FORM PORTLET-->
 					<div class="portlet light ">
 						<div class="portlet-title">
 							<div class="caption font-red-sunglo">
 								<i class="icon-settings font-red-sunglo"></i> <span
-									class="caption-subject bold">Assignment List</span>
+									class="caption-subject bold">My Assignment List</span>
 							</div>
 							<div class="actions">
 								<div class="btn-group">
@@ -41,7 +29,7 @@
 										class="fa fa-angle-down"></i>
 									</a>
 									<ul class="dropdown-menu pull-right">
-										<li><a th:href="@{/teacher/assignment}"><i class="fa fa-plus-circle"></i>Create Assignment</a></li>
+										<!-- <li><a th:href="@{/teacher/assignment}"><i class="fa fa-plus-circle"></i>Create Assignment</a></li> -->
 									</ul>
 								</div>
 							</div>
@@ -50,7 +38,7 @@
 					
 					
 					
-					<th:block th:include="fragments/searchAssignment :: searchAssignment"></th:block>
+					<!-- <th:block th:include="fragments/searchAssignment :: searchAssignment"></th:block> -->
 					
 					
 					
@@ -63,64 +51,47 @@
 									<tr>
 										<th>Title</th>
 										<th>Session</th>
-								
 										<th>
 										<span data-toggle="tooltip" data-placement="top" title="Assignment Status" class="glyphicon glyphicon-stats"></span>
 										</th>
-										<th width="29%">
-										<span data-toggle="tooltip" data-placement="top" title="Submission Date" class="glyphicon glyphicon-time"></span>
+										<th width="15%">
+										<span data-toggle="tooltip" data-placement="top" title="Submit Date" class="glyphicon glyphicon-time"></span>
 										</th>
-										<th>
-										<span data-toggle="tooltip" data-placement="top" title="No. of Assignment Documents" class="fa fa-files-o"></span>
+										<th width="15%">
+										<span data-toggle="tooltip" data-placement="top" title="Last Date Of Submission" class="glyphicon glyphicon-time"></span>
 										</th>
-										<th>
-										<span data-toggle="tooltip" data-placement="top" title="No. of Students" class="fa fa-users"></span>
-										</th>
-										<th>
-										<span data-toggle="tooltip" data-placement="top" title="Submitted" class="fa fa-upload"></span>
-										</th>
-										<!-- <th>Time Remains</th> -->
-										<th width="18%">
-										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
+										<th width="8%">
+											<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
 										</th>
 									</tr>
 								</thead>
-								<tbody th:if="${not #lists.isEmpty(assignmentInfoDtos)}">
-									<tr th:each="assignmentInfoDto,rowStat : ${assignmentInfoDtos}">
-										<!-- <td th:text="${rowStat.count}">1</td> -->
-										<td data-title="Title" th:text="${assignmentInfoDto.title}">Title</td>
-										<td data-title="Session" th:text="${assignmentInfoDto.session}">Session</td>
+								<tbody th:if="${not #lists.isEmpty(studentAssignments)}">
+									<tr th:each="assignmentStudent,rowStat : ${studentAssignments}">
+										<td data-title="Title" th:text="${assignmentStudent.assignment.title}">Title</td>
+										<td data-title="Session" th:text="${assignmentStudent.assignment.session}">Session</td>
 										
-										<td data-title="Assignment Status" th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentInfoDto.status} == true">Published</td>
-										<td data-title="Assignment Status" th:class="${assignmentInfoDto.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentInfoDto.status} == false">Saved</td>
+										<td data-title="Assignment Status" th:class="${assignmentStudent.status} ? 'label label-success' : 'label label-danger'"  th:if="${assignmentStudent.status} == true">Submitted</td>
+										<td data-title="Assignment Status" th:class="${assignmentStudent.status} ? 'label label-success' : 'label label-danger'"  th:if="${assignmentStudent.status} == false">Not Submitted</td>
 										
-										<td data-title="Submission Date" th:text="${assignmentInfoDto.submitEndDate} ? ${#calendars.format(assignmentInfoDto.submitStartDate,'dd MMM yyyy hh:mm a')+' to '+#calendars.format(assignmentInfoDto.submitEndDate,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
+										<td data-title="Submit Date" th:text="${assignmentStudent.submitDate} ? ${#calendars.format(assignmentStudent.submitDate,'dd MMM yyyy hh:mm a')}">Submit date</td>
 										
-										<td data-title="No. of Assignment Documents" align="center" th:text="${assignmentInfoDto.assignmentDocuments}">No. of Assignment Documents</td>
-										
-										<td data-title="No. of Students" align="center" th:text="${assignmentInfoDto.totalNumberOfStudent}">No. Of Students</td>
-										
-										<td data-title="Submitted" align="center" th:text="${assignmentInfoDto.totalNumberOfSubmittedStudent}">Submitted</td>
+										<td data-title="Last Date Of Submission" th:text="${assignmentStudent.submitEndDate} ? ${#calendars.format(assignmentStudent.submitEndDate,'dd MMM yyyy hh:mm a')}">Last date of submission</td>
 
-										<!-- <td>Time Remains</td> -->
 										<td data-title="Actions" >
-											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File(s) To Assignment" th:href="@{/teacher/addDocument/} + ${assignmentInfoDto.id}"><span class="fa fa-files-o"></span></a>
-											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Student" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
-											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit Assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
-											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " th:href="@{/teacher/downloadStudentsAssignmentDocuments(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-download"></span></a>
-											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Cancel Assignment" href="#"><span class="glyphicon glyphicon-stop"></span></a>
+											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Details" th:href="@{/student/assignment/} + ${assignmentStudent.id}"><span class="fa fa-eye"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File To Assignment" th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}"><span class="fa fa-file"></span></a>
 										</td>
 									</tr>
 								</tbody>
 								
-								<tbody th:if="${#lists.isEmpty(assignmentInfoDtos)}">
+								<tbody th:if="${studentAssignments.getTotalElements() eq 0}">
 									<tr>
-										<td class="alert alert-warning" align="center" colspan="8">No Assignment Found!</td>
+										<td class="alert alert-warning" align="center" colspan="7">No Assignment Found!</td>
 									</tr>
 								</tbody>
 							</table>
 
-						<div th:if="${isSearch}=='true'">
+						<!-- <div th:if="${isSearch}=='true'">
 							
 							<div class="row">
 							<div th:if="${assignments.getTotalPages() > 0}">
@@ -152,9 +123,9 @@
 							</div>
 						</div>
 						
-						</div>
+						</div> -->
 
-						<div th:if="${isSearch==null}">
+						<!-- <div th:if="${isSearch==null}">
 							
 						<div class="row">
 							<div th:if="${assignments.getTotalPages() > 0}">
@@ -185,7 +156,7 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</div> -->
 				</div>
 			
 		</div>
@@ -217,6 +188,7 @@
 			</div> -->
 		
 		</div>
-   </div>
+		
+	</div>
 </body>
 </html>

@@ -14,16 +14,20 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,13 +45,12 @@ import info.dia.service.IAssignmentService;
 import info.dia.service.IAssignmentStudentService;
 import info.dia.service.IDocumentService;
 import info.dia.service.IUserService;
-import info.dia.web.dto.DocumentDto;
 import info.dia.web.dto.StudentDocumentDto;
 import info.dia.web.error.AssignmentDateTimeException;
-import info.dia.web.util.DocumentMapper;
 import info.dia.web.util.HelperUtils;
 
 @Controller
+@PreAuthorize("hasAuthority('STUDENT_PRIVILEGE')")
 @RequestMapping(value="/student")
 public class StudentController {
 	
@@ -77,11 +80,60 @@ public class StudentController {
 	
 	
 	
-	@RequestMapping(value="/assignment",method=RequestMethod.GET)
-	public String assignment(Model model,@RequestParam(value = "page", required = false) Integer page,
+	@RequestMapping(value="/assignment/{id}",method=RequestMethod.GET)
+	public String assignment(Model model,@PathVariable("id") long assignmentStudentId){
+		Authentication authentication = authenticationFacade.getAuthentication();
+		if(!(authentication instanceof AnonymousAuthenticationToken)){
+			User currentUser = userService.findUserByEmail(authentication.getName());
+			AssignmentStudent assignmentStudent = assignmentStudentService.getAssignmentStudentByIdAndEmail(assignmentStudentId,currentUser.getEmail());
+			if (assignmentStudent!=null) {
+				List<Document> assignmentsDocuments = uploadService.getAllDocumentsByUserIdAndAssignmentIdAndStatus(assignmentStudent.getAssignment().getUser().getId(),assignmentStudent.getAssignment().getId(),1);
+				if (assignmentsDocuments.size()>0) {
+					model.addAttribute("assignmentsDocuments",assignmentsDocuments);
+				}
+				model.addAttribute("assignmentStudent", assignmentStudent);
+			}
+		}
+		return "student/assignment";
+	}
+	
+	
+		//Assignment reference Document Download
+		@PreAuthorize("hasAuthority('ASSIGNMENT_REFERENCE_DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	    @RequestMapping(value = "/downloadAssignmentReferenceDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
+	    public void downloadAssignmentReferenceDocument(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
+			
+			Authentication authentication = authenticationFacade.getAuthentication();
+			
+			if (!(authentication instanceof AnonymousAuthenticationToken)) {
+				
+				Assignment assignment = assignmentService.getAssignmentById(assignmentId);
+				
+				User assignmentUser = userService.findUserByEmail(assignment.getUser().getEmail());
+				
+				Document dataFile = uploadService.getDocumentByIdAndAssignmentIdAndUser(documentId,assignmentId,assignmentUser.getId());
+				
+				if (dataFile!=null) {
+					File file = new File(dataFile.getLocation(), dataFile.getName());
+					try {
+						response.setContentType(dataFile.getType());
+						response.setHeader("Content-disposition", "attachment; filename=\"" + dataFile.getName() + "\"");
+						FileCopyUtils.copy(FileUtils.readFileToByteArray(file), response.getOutputStream());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+	    }
+	
+	
+	@RequestMapping(value="/assignments",method=RequestMethod.GET)
+	public String assignments(Model model,@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "sortString", required = false) String sortString,
 			@RequestParam(value = "oldSortString", required = false) String oldSortString,
 			@RequestParam(value = "oldDirection", required = false) Direction oldDirection){
+		
+		LOGGER.info("Inside student assignments :");
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
 		if(!(authentication instanceof AnonymousAuthenticationToken)){
@@ -99,7 +151,7 @@ public class StudentController {
 			model.addAttribute("pager", pager);
 			
 		}
-		return "student/assignment";
+		return "student/assignments";
 	}
 	
 	
@@ -233,7 +285,7 @@ public class StudentController {
 		    fileInfo.setUserId(user.getId());
 		    fileInfo.setAssignmentId(assignmentId);
 		    fileInfo.setAssignmentStudentId(assignmentStudentId);
-		    fileInfo.setStatus(2);  // Status = 2, student assignment document
+		    fileInfo.setStatus(2);  //Status = 2, student assignment document
 		    
 		    return fileInfo;
 	}
@@ -261,8 +313,10 @@ public class StudentController {
 		calendar.setTime(new Date());
 		
 		AssignmentStudent assignmentStudent  = assignmentStudentService.getAssignmentStudentByEmailAndAssignmentId(email,assignmentId);
-		LOGGER.info("assignmentStudent :"+assignmentStudent.getEmail()+" assignmentStudentId :"+assignmentStudent.getId()+" And assignmentId :"+assignmentStudent.getAssignment().getId());
-		LOGGER.info("Assignment DateTime Expired Or Not: "+calendar.getTime().before(assignmentStudent.getSubmitEndDate())+ "Date :"+calendar.getTime()+"---->"+assignmentStudent.getSubmitEndDate());
+		
+		/*LOGGER.info("assignmentStudent :"+assignmentStudent.getEmail()+" assignmentStudentId :"+assignmentStudent.getId()+" And assignmentId :"+assignmentStudent.getAssignment().getId());
+		LOGGER.info("Assignment DateTime Expired Or Not: "+calendar.getTime().before(assignmentStudent.getSubmitEndDate())+ "Date :"+calendar.getTime()+"---->"+assignmentStudent.getSubmitEndDate());*/
+		
 		if (calendar.getTime().after(assignmentStudent.getSubmitEndDate())) {
 			assignmentDateTimeExpiredOrNot = true;
 		}

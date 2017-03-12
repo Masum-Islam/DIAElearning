@@ -203,8 +203,8 @@
 										<td class="assignmentId" style="display:none;" th:text="${assignmentStudentInfo.assignmentId}"></td>
 										<td class="email" data-title="Email" th:text="${assignmentStudentInfo.email}">Email</td>
 										
-										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == true">Submitted</td>
-										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-primary'"  th:if="${assignmentStudentInfo.status} == false">Not Submitted</td>
+										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-danger'"  th:if="${assignmentStudentInfo.status} == true">Submitted</td>
+										<td data-title="Assignment Status" th:class="${assignmentStudentInfo.status} ? 'label label-success' : 'label label-danger'"  th:if="${assignmentStudentInfo.status} == false">Not Submitted</td>
 										
 										<td data-title="Submitted Date" th:text="${assignmentStudentInfo.submitedDate} ? ${#calendars.format(assignmentStudentInfo.submitedDate,'dd MMM yyyy hh:mm a')}">Submitted Date</td>
 										

@@ -15,6 +15,8 @@ public interface IDocumentService {
 	
 	List<Document> getAllDocumentsByAssignmenmt(Assignment assignment);
 	
+	List<Document> getAllDocumentsByUserIdAndAssignmentIdAndStatus(Long userId,Long assignmentId,int status);
+	
 	Document findById(long id);
 	
 	Document getDocumentByIdAndAssignmentAndUser(Long id,Assignment assignment,Long userId);

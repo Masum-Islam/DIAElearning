@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -81,6 +82,7 @@ import info.dia.web.util.GenericResponse;
 import info.dia.web.util.HelperUtils;
 
 @Controller
+@PreAuthorize("hasAuthority('TEACHER_PRIVILEGE')")
 @RequestMapping(value="/teacher")
 public class TeacherController {
 	
@@ -333,6 +335,7 @@ public class TeacherController {
     	
     	return "/teacher/assignmentList";
 	}
+	
 	
 	@RequestMapping(value="/assignment/{id}",method=RequestMethod.GET)
 	public String editAssignment(Model model,@PathVariable("id") long id){
@@ -593,7 +596,7 @@ public class TeacherController {
 		Authentication authentication = authenticationFacade.getAuthentication();
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
     		User assignmentUser = userService.findUserByEmail(authentication.getName());
-    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId, assignmentUser.getId());
+    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId,assignmentUser.getId());
     		if(assignment!=null){
     			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
     			if (documents.size()>0) {
@@ -607,17 +610,16 @@ public class TeacherController {
 	}
 	
 	//Assignment reference Document Download
-	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	@PreAuthorize("hasAuthority('ASSIGNMENT_REFERENCE_DOCUMENT_DOWNLOAD_PRIVILEGE')")
     @RequestMapping(value = "/downloadAssignmentReferenceDocument/{documentId}/{assignmentId}", method = RequestMethod.GET)
     public void downloadAssignmentReferenceDocument(HttpServletResponse response,@PathVariable Long documentId,@PathVariable Long assignmentId) {
-
 		Authentication authentication = authenticationFacade.getAuthentication();
 		
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 			
 			User assignmentUser = userService.findUserByEmail(authentication.getName());
 
-			Document dataFile = uploadService.getDocumentByIdAndAssignmentIdAndUser(documentId, assignmentId, assignmentUser.getId());
+			Document dataFile = uploadService.getDocumentByIdAndAssignmentIdAndUser(documentId,assignmentId,assignmentUser.getId());
 			if (dataFile!=null) {
 				LOGGER.info("dataFile :"+dataFile.getLocation()+"--->"+dataFile.getName());
 				File file = new File(dataFile.getLocation(), dataFile.getName());
@@ -634,7 +636,7 @@ public class TeacherController {
 	
 	
 	//Student Assignment Document Download
-	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	@PreAuthorize("hasAuthority('ASSIGNMENT_DOCUMENT_DOWNLOAD_PRIVILEGE')")
 	@RequestMapping(value = "/downloadStudentAssignmentDocument",method = RequestMethod.GET,produces="application/zip")
 	public void downloadStudentAssignmentDocument(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam String email) {
 
@@ -655,10 +657,10 @@ public class TeacherController {
 		}			
 	 }
 		
-	@PreAuthorize("hasAuthority('DOCUMENT_DOWNLOAD_PRIVILEGE')")
+	@PreAuthorize("hasAuthority('ASSIGNMENT_DOCUMENT_DOWNLOAD_PRIVILEGE')")
 	@RequestMapping(value = "/downloadStudentsAssignmentDocuments", produces="application/zip")
 	@ResponseBody
-	public byte[] downloadStudentsAssignmentDocuments(HttpServletResponse response,@RequestParam Long assignmentId,@RequestParam(value = "emails[]",required = false) String[] emails) throws IOException {
+	public byte[] downloadStudentsAssignmentDocuments(HttpServletResponse response,@RequestParam("assignmentId") Long assignmentId,@RequestParam(value = "emails[]",required = false) String[] emails) throws IOException {
 		
 		Assignment assignment = assignmentService.getAssignmentById(assignmentId);
 
@@ -673,13 +675,25 @@ public class TeacherController {
 
         //simple file list, just for tests
         ArrayList<File> files = new ArrayList<>();
+       /* LOGGER.info("Emails :"+emails.length);*/
         if (emails != null) {
 			for (String email : emails) {
 				User studentUser = userService.findUserByEmail(email);
-				Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId, studentUser.getId());
+				Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId,studentUser.getId());
 				if (dataFile != null) {
 					File file = new File(dataFile.getLocation(), dataFile.getName());
 					files.add(file);
+				}
+			}
+		}else {
+			for (AssignmentStudent assignmentStudent : assignment.getAssignmentStudents()) {
+				if (assignmentStudent.isStatus()) {
+					User studentUser = userService.findUserByEmail(assignmentStudent.getEmail());
+					Document dataFile = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId,studentUser.getId());
+					if (dataFile != null) {
+						File file = new File(dataFile.getLocation(), dataFile.getName());
+						files.add(file);
+					}
 				}
 			}
 		}

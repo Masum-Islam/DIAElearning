@@ -143,4 +143,9 @@ public class DocumentService implements IDocumentService {
 		return documentRepository.findByAssignmentIdAndUserId(assignmentId, userId);
 	}
 
+	@Override
+	public List<Document> getAllDocumentsByUserIdAndAssignmentIdAndStatus(Long userId, Long assignmentId, int status) {
+		return documentRepository.findAllByUserIdAndAssignmentIdAndStatus(userId, assignmentId, status);
+	}
+
 }

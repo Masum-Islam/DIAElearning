@@ -68,7 +68,7 @@
                         <li sec:authorize="hasAuthority('STUDENT_PRIVILEGE')" class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Student'} ? 'dropdown active' : 'dropdown'">
 					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Assignment<span class="caret"></span></a>
 					            <ul class="dropdown-menu">
-					                <li><a th:href="@{/student/assignment}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>My Assignment</a></li>
+					                <li><a th:href="@{/student/assignments}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>My Assignment</a></li>
 					                <!-- <li><a th:href="@{/authorizationDocumentUpload}">Authorization Document Upload</a></li>				                
 					                <li><a th:href="@{/answerUpload}">Answer Submission</a></li> -->
 					            </ul>

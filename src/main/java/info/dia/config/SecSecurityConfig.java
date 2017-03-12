@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,8 +18,11 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
+import info.dia.security.CustomAccessDeniedHandler;
+
 @Configuration
 @ComponentScan(basePackages = {"info.dia.security"})
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableWebSecurity
 public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -33,6 +37,11 @@ public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthenticationFailureHandler authenticationFailureHandler;
+    
+    
+    @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
+    
 
     public SecSecurityConfig() {
         super();
@@ -73,6 +82,8 @@ public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidSessionUrl("/invalidSession.html")
                 .sessionFixation().none()
             .and()
+            /*.exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+        	.and()*/
             .logout()
             	.logoutUrl("/logout")
                 .logoutSuccessHandler(myLogoutSuccessHandler)
