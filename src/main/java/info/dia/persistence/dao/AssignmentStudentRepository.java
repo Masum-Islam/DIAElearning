@@ -14,7 +14,7 @@ public interface AssignmentStudentRepository extends JpaRepository<AssignmentStu
 	
 	Page<AssignmentStudent> findAllByAssignment(Assignment assignment,Pageable pageable);
 	
-	Page<AssignmentStudent> findAllByEmailAndAssignmentStatus(String email,Boolean status,Pageable pageable);
+	Page<AssignmentStudent> findAllByEmailAndAssignmentStatusTrue(String email,Pageable pageable);
 	
 	AssignmentStudent findByEmailAndAssignmentId(String email,Long assignmentId);
 	

@@ -15,12 +15,14 @@ public interface IAssignmentStudentService {
 	
 	AssignmentStudent findByAssignmentStudentId(long assignmentStudentId);
 	
-	Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,Boolean status,Pageable pageable);
+	Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatusTrue(String email,Pageable pageable);
 	
 	AssignmentStudent saveOrUpdate(AssignmentStudent assignmentStudent);
 	
 	AssignmentStudent getAssignmentStudentByEmailAndAssignmentId(String email,Long assignmentId);
 	
 	AssignmentStudent getAssignmentStudentByIdAndEmail(Long assignmentStudentId,String email);
+	
+	Page<AssignmentStudent> searchAssignmentStudentByStudent(String email,SearchDTO searchDTO, Pageable p);
 
 }

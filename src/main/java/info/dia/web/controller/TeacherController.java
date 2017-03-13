@@ -139,7 +139,7 @@ public class TeacherController {
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
-    		String roleName = "ROLE_USER";
+    		String roleName = "ROLE_STUDENT";
     		model.addAttribute("assignmentDto",new AssignmentDto());
     		model.addAttribute("emailsFrom",userService.findByRoles(roleName));
     	}
@@ -215,6 +215,8 @@ public class TeacherController {
 		     }
 		return "/teacher/assignmentList";
 	}
+	
+	
 	
 	//Assignment Document
 	@RequestMapping(value="/addDocument/{assignmentId}",method=RequestMethod.GET)
@@ -303,8 +305,6 @@ public class TeacherController {
 		
 		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
 		
-		
-		
 		return searchAssignment(model, session, searchDTO, pageRequest);
 	}
 	
@@ -373,6 +373,7 @@ public class TeacherController {
 				model.addAttribute("assignmentDto", assignmentDto);
 				
 				viewPage = "teacher/assignment";
+				
 			}else{
 				
 				viewPage = "error/404";
@@ -571,6 +572,7 @@ public class TeacherController {
 	public List<EmailsDto> getAssignmentEmails(@PathVariable("query") String query){
 		
 		List<EmailsDto> emails = new ArrayList<>();
+		
 		LOGGER.info("query String :"+query);
 		
 		Iterable<User> iterable = userService.searchEmail(query);
@@ -583,6 +585,8 @@ public class TeacherController {
 			dto.setName(user.getFirstName()+" "+user.getLastName());
 			emails.add(dto);
 		}
+		
+		LOGGER.info("emails size :"+emails.size());
 		
 		return emails;
 	}
@@ -730,7 +734,7 @@ public class TeacherController {
 	@RequestMapping(value="/group",method=RequestMethod.GET)
 	public String createGroup(Model model){
 		
-		String roleName = "ROLE_USER";
+		String roleName = "ROLE_STUDENT";
 		
 		LOGGER.info("User List size:"+userService.findByRoles(roleName));
 		
@@ -812,7 +816,7 @@ public class TeacherController {
        	long id = Long.parseLong(groupId);
        	
        	Group group = groupService.getByGroupId(id);
-       	String roleName = "ROLE_USER";
+       	String roleName = "ROLE_STUDENT";
        	       	
        	GroupDto groupDto = new GroupDto();
        	

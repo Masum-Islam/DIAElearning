@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -21,13 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +46,7 @@ import info.dia.service.IAssignmentService;
 import info.dia.service.IAssignmentStudentService;
 import info.dia.service.IDocumentService;
 import info.dia.service.IUserService;
+import info.dia.web.dto.SearchDTO;
 import info.dia.web.dto.StudentDocumentDto;
 import info.dia.web.error.AssignmentDateTimeException;
 import info.dia.web.util.HelperUtils;
@@ -141,7 +143,7 @@ public class StudentController {
 			User currentUser = userService.findUserByEmail(authentication.getName());
 			PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
 			
-			Page<AssignmentStudent> studentAssignments = assignmentStudentService.getAllStudentAssignmentByEmailAndAssignmentStatus(currentUser.getEmail(),true,pageRequest);
+			Page<AssignmentStudent> studentAssignments = assignmentStudentService.getAllStudentAssignmentByEmailAndAssignmentStatusTrue(currentUser.getEmail(),pageRequest);
 			
 			LOGGER.info("Student Assignment Size:"+studentAssignments.getTotalElements());
 			
@@ -149,9 +151,59 @@ public class StudentController {
 			
 			model.addAttribute("studentAssignments", studentAssignments);
 			model.addAttribute("pager", pager);
+			model.addAttribute("searchDTO", new SearchDTO());
 			
 		}
 		return "student/assignments";
+	}
+	
+	
+	@RequestMapping(value = "/assignments/search",method=RequestMethod.GET)
+	public String search(
+			Model model,
+			HttpSession session,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection,
+			@ModelAttribute("searchDTO") SearchDTO searchDTO) {
+		
+		
+		/*LOGGER.info("Search Method Called!"+" with search string :"+searchDTO.getSearchString()+" and boolean value:"+searchDTO.getAssignmentStatus());*/
+		
+		SearchDTO sessionSearchDTO = (SearchDTO) session.getAttribute("searchDTO");
+		
+		if (sessionSearchDTO != null && page != null) {
+			searchDTO = sessionSearchDTO;
+		}
+		
+		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		
+		
+		
+		return searchAssignment(model, session, searchDTO, pageRequest);
+	}
+	
+	public String searchAssignment(Model model, HttpSession session, SearchDTO searchDTO,PageRequest pageRequest){
+		
+		Authentication authentication = authenticationFacade.getAuthentication();
+		
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		
+    		User user = userService.findUserByEmail(authentication.getName());
+
+    		Page<AssignmentStudent> studentAssignments = assignmentStudentService.searchAssignmentStudentByStudent(user.getEmail(),searchDTO,pageRequest);
+    		
+    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(studentAssignments.getTotalPages(),studentAssignments.getNumber(),BUTTONS_TO_SHOW);
+    		
+    		model.addAttribute("studentAssignments", studentAssignments);
+			model.addAttribute("pager", pager);
+    		model.addAttribute("searchDTO", searchDTO != null ? searchDTO: new AssignmentStudent());
+    		model.addAttribute("isSearch", "true");
+    		session.setAttribute("searchDTO", searchDTO);
+    	}
+    	
+    	return "student/assignments";
 	}
 	
 	
@@ -188,7 +240,7 @@ public class StudentController {
 	@RequestMapping(value="/assignmentDocument/{assignmentId}",method=RequestMethod.GET)
 	public String getAssignmentDocument(@PathVariable("assignmentId") long assignmentId,Model model){
 		
-		LOGGER.info("getAssignmentDocument :"+assignmentId);
+		/*LOGGER.info("getAssignmentDocument :"+assignmentId);*/
 		
 		Authentication authentication = authenticationFacade.getAuthentication();
     	if (!(authentication instanceof AnonymousAuthenticationToken)) {
@@ -210,7 +262,7 @@ public class StudentController {
 		Authentication authentication = authenticationFacade.getAuthentication();
 		List<StudentDocumentDto> uploadedFiles = null;
 		
-		LOGGER.info("Student DocumentId :"+id);
+		/*LOGGER.info("Student DocumentId :"+id);*/
 		
 		if (!(authentication instanceof AnonymousAuthenticationToken)) {
 

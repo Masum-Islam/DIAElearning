@@ -207,7 +207,7 @@ public class UserService implements IUserService {
 		
 
 		Predicate predicate = qUser.email.containsIgnoreCase(filter)
-				   .and(qUser.roles.any().name.eq("ROLE_USER"));
+				   .and(qUser.roles.any().name.eq("ROLE_STUDENT"));
 		
 		
 		return repository.findAll(predicate);

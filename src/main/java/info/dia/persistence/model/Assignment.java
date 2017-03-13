@@ -32,6 +32,8 @@ public class Assignment {
 	
 	private Boolean status;
 	
+	/*private Boolean cancel;*/
+	
 	@Column(columnDefinition = "TEXT")
 	private String instructions;
 	
@@ -65,7 +67,7 @@ public class Assignment {
 	
 
 	public Assignment() {
-		
+		/*this.cancel = false;*/
 	}
 
 
@@ -196,9 +198,22 @@ public class Assignment {
 		return "Assignment [id=" + id + ", title=" + title + ", session=" + session + ", status=" + status
 				+ ", instructions=" + instructions + ", submitStartDate=" + submitStartDate + ", submitEndDate="
 				+ submitEndDate + ", createDate=" + createDate + ", modifiedDate=" + modifiedDate + ", user=" + user
-				+ ", assignmentStudents=" + assignmentStudents + "]";
+				+ ", assignmentStudents=" + assignmentStudents + ", assignmentDocuments=" + assignmentDocuments + "]";
 	}
+
+
+	/*public Boolean getCancel() {
+		return cancel;
+	}
+
+
+	public void setCancel(Boolean cancel) {
+		this.cancel = cancel;
+	}*/
+
+
 	
+
 	
 
 }

@@ -105,7 +105,7 @@ $(document).ready(function () {
 	            
 	    	   var REGEX_EMAIL = '([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@' +'(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)';
 
-	    	   var $select =   $('#select-to').selectize({
+	    	   var $select =   $('#assignmentEmail').selectize({
 	            	persist: false,
 	            	delimiter:',',
 					maxItems: null,

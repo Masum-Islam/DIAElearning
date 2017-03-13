@@ -57,7 +57,6 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 				b = b.and(qAssignmentStudent.assignment.id.eq(assignment.getId()));
 			}
 		}
-		LOGGER.info("Assignment Student Size............."+assignmentStudentRepository.findAll(b, pageable).getTotalElements());
 		return assignmentStudentRepository.findAll(b, pageable);
 	}
 
@@ -69,8 +68,8 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 
 
 	@Override
-	public Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,Boolean status,Pageable pageable) {
-		return assignmentStudentRepository.findAllByEmailAndAssignmentStatus(email,status,pageable);
+	public Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatusTrue(String email,Pageable pageable) {
+		return assignmentStudentRepository.findAllByEmailAndAssignmentStatusTrue(email,pageable);
 	}
 
 
@@ -89,6 +88,40 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	@Override
 	public AssignmentStudent getAssignmentStudentByIdAndEmail(Long assignmentStudentId, String email) {
 		return assignmentStudentRepository.findByIdAndEmail(assignmentStudentId, email);
+	}
+
+
+	@Override
+	public Page<AssignmentStudent> searchAssignmentStudentByStudent(String email, SearchDTO searchDTO, Pageable p) {
+		
+		BooleanBuilder b = new BooleanBuilder();
+		
+		QAssignmentStudent qAssignmentStudent = QAssignmentStudent.assignmentStudent;
+		
+		if (searchDTO!=null) {
+			
+			if (!StringUtils.isEmpty(searchDTO.getSearchString()) && searchDTO.getAssignmentStatus()!=null) {
+				b = b.and(qAssignmentStudent.assignment.title.containsIgnoreCase(searchDTO.getSearchString())
+						.or(qAssignmentStudent.status.eq(searchDTO.getAssignmentStatus()))
+						.or(qAssignmentStudent.assignment.session.containsIgnoreCase(searchDTO.getSearchString()))
+						.and(qAssignmentStudent.email.eq(email))
+						.and(qAssignmentStudent.assignment.status.eq(true)));
+			}else if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
+				b = b.and(qAssignmentStudent.assignment.title.containsIgnoreCase(searchDTO.getSearchString())
+						.or(qAssignmentStudent.assignment.session.containsIgnoreCase(searchDTO.getSearchString()))
+						.and(qAssignmentStudent.email.eq(email))
+						.and(qAssignmentStudent.assignment.status.eq(true)));
+			}else if (searchDTO.getAssignmentStatus()!=null) {
+				b = b.and(qAssignmentStudent.status.eq(searchDTO.getAssignmentStatus())
+						.and(qAssignmentStudent.email.eq(email))
+						.and(qAssignmentStudent.assignment.status.eq(true)));
+			}else {
+				b = b.and(qAssignmentStudent.email.eq(email)
+					  .and(qAssignmentStudent.assignment.status.eq(true)));
+			}
+		}
+		
+		return assignmentStudentRepository.findAll(b, p);
 	}
 
 

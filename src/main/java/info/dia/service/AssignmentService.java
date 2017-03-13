@@ -92,7 +92,8 @@ public class AssignmentService implements IAssignmentService{
         			
         			for (String email : emailList) {
         				
-        				AssignmentStudent existsAssignmentStudent = assignmentStudentRepository.findByEmailAndAssignmentId(email,assignmentDto.getId()); 
+        				AssignmentStudent existsAssignmentStudent = assignmentStudentRepository.findByEmailAndAssignmentId(email,assignmentDto.getId());
+        				
         				if (existsAssignmentStudent!=null) {
         					
         					assignmentStudents.add(existsAssignmentStudent);
@@ -143,7 +144,7 @@ public class AssignmentService implements IAssignmentService{
     			
     			// Sent email
     			/*if (assignment.getStatus()==false && assignmentDto.getStatus()==true) {
-					emailService.sendAssignmentNotification(sendEmailUserList, assignmentDto,assignmentUser);
+					emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);
 				}else if (assignment.getStatus()==true) {
 					LOGGER.info("Assignment Status: "+assignmentDto.getStatus());
 					

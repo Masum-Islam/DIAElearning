@@ -50,7 +50,7 @@
 					
 					
 					
-					<th:block th:include="fragments/searchAssignment :: searchAssignment"></th:block>
+					<th:block th:include="fragments/teacher/searchAssignment :: searchAssignment"></th:block>
 					
 					
 					
@@ -80,7 +80,7 @@
 										<span data-toggle="tooltip" data-placement="top" title="Submitted" class="fa fa-upload"></span>
 										</th>
 										<!-- <th>Time Remains</th> -->
-										<th width="18%">
+										<th width="15%">
 										<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
 										</th>
 									</tr>
@@ -108,7 +108,7 @@
 											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Student" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
 											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit Assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
 											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " th:href="@{/teacher/downloadStudentsAssignmentDocuments(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-download"></span></a>
-											<a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Cancel Assignment" href="#"><span class="glyphicon glyphicon-stop"></span></a>
+											<!-- <a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Cancel Assignment" href="#"><span class="glyphicon glyphicon-stop"></span></a> -->
 										</td>
 									</tr>
 								</tbody>

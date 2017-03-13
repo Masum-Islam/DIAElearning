@@ -52,14 +52,17 @@
 			    	 	if(assignmentStudnetIds.length>0){
 			    	 		 assignmentStudnetIds = assignmentStudnetIds.filter(function(e){return e}); 
 			    	 		 ajaxURL = ajaxURL+'/'+assignmentStudnetIds;
+			    	 		 
+			    	 		$.get(ajaxURL+"?assignmentId="+assignmentId,function(){
+				    	    	window.location.href = ajaxURL+"?assignmentId="+assignmentId;
+				    	    	console.log(assignmentStudnetIds);
+				    	    });
+			    	 		
+			    	 	}else{
+			    	 		errorMsg("Please select an email");
 			    	 	} 
 			    	 	
-			    	 	$.get(ajaxURL+"?assignmentId="+assignmentId,function(){
-			    	    	window.location.href = ajaxURL+"?assignmentId="+assignmentId;
-			    	    	console.log(assignmentStudnetIds);
-			    	    }).fail(function() {
-			    	    	errorMsg("Please select an email");
-			    	    });
+			    	 	
 			    });
 			});
 			
@@ -171,7 +174,7 @@
 							
 						</div>
 						
-						<th:block th:include="fragments/searchAssignmentStudent :: searchAssignmentStudent"></th:block>
+						<th:block th:include="fragments/teacher/searchAssignmentStudent :: searchAssignmentStudent"></th:block>
 						
 						<div id="no-more-tables" class="portlet-body form">
 

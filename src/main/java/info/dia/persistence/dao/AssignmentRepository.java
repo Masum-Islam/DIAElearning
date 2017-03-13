@@ -14,6 +14,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long>,Qu
 	Page<Assignment> findByUser(User user,Pageable pageable);
 	
 	Page<Assignment> findByTitleLikeIgnoreCase(User user,String title,Pageable pageable);
+	
 	Page<Assignment> findByStatus(User user,boolean status,Pageable pageable);
 	
 	Assignment findByIdAndUserId(long id,long userId);
