@@ -75,14 +75,14 @@ $(document).ready(function () {
         	errorMsg(data.responseJSON.message);
         }else{
         	var errors = $.parseJSON(data.responseJSON.message);
-            $.each( errors, function( index,item ){
+            $.each( errors,function( index,item ){
                 errorMsg(item.defaultMessage);
             });
         }
     });
 }
 
- $('#assignment-button[data-loading-text]')
+ $('button[data-loading-text]')
  .on('click', function () {
  	ajaxSetUp();
  });
@@ -92,9 +92,9 @@ $(document).ready(function () {
 		
 		$.ajaxSetup({
 			   beforeSend: function() {
-				   $("#assignment-button").button('loading');
+				   $("#assignment-create-button").button('loading');
 				},complete: function() {
-					$("#assignment-button").button('reset');
+					$("#assignment-create-button").button('reset');
 		        }
 		});
 		

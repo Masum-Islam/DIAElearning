@@ -151,7 +151,7 @@ public class UserController {
     
     // Save password
     @RequestMapping(value = "/user/savePassword", method = RequestMethod.POST)
-    @PreAuthorize("hasRole('READ_PRIVILEGE')")
+    @PreAuthorize("hasAuthority('CHANGE_PASSWORD_PRIVILEGE')")
     @ResponseBody
     public GenericResponse savePassword(final Locale locale, @Valid PasswordDto passwordDto) {
         final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -161,7 +161,7 @@ public class UserController {
     
     // Update Password
     @RequestMapping(value = "/user/updatePassword", method = RequestMethod.POST)
-    @PreAuthorize("hasRole('READ_PRIVILEGE')")
+    @PreAuthorize("hasAuthority('CHANGE_PASSWORD_PRIVILEGE')")
     @ResponseBody
     public GenericResponse changeUserPassword(final Locale locale, @Valid PasswordDto passwordDto) {
         final User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());

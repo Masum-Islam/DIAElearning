@@ -25,6 +25,7 @@ public class AssignmentStudent {
 	
 	private boolean status;
 	
+	private boolean isDateChange;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@DateTimeFormat ( pattern="M/dd/yyyy hh:mm a")
@@ -105,6 +106,14 @@ public class AssignmentStudent {
 
 	public void setSubmitDate(Date submitDate) {
 		this.submitDate = submitDate;
+	}
+
+	public boolean isDateChange() {
+		return isDateChange;
+	}
+
+	public void setDateChange(boolean isDateChange) {
+		this.isDateChange = isDateChange;
 	}
 
 	/*public Group getGroup() {

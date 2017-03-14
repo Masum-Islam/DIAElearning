@@ -94,15 +94,16 @@ public class EmailService {
                      final Locale locale = new Locale(Locale.ENGLISH.toString());
                      
                      final Context ctx = new Context(locale);
+                     
                      ctx.setVariable("assignmentCreator", assignmentUser.getFirstName()+" "+assignmentUser.getLastName());
-                     ctx.setVariable("name", user.getFirstName()+" "+user.getLastName());
+                     ctx.setVariable("name", user.getFirstName()+" "+user.getLastName()!=null?user.getLastName():" ");
                      ctx.setVariable("title", assignmentDto.getTitle());
                      ctx.setVariable("session", assignmentDto.getSession());
                      ctx.setVariable("startDate", assignmentDto.getSubmitStartDate());
                      ctx.setVariable("endDate", assignmentDto.getSubmitEndDate());
                      
                      
-                     final String htmlContent = templateEngine.process("assignmentInformationEmail",ctx);
+                    final String htmlContent = templateEngine.process("assignmentInformationEmail",ctx);
                      
                     message.setText(htmlContent, true /* isHtml */);
                      

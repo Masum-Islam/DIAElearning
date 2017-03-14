@@ -550,6 +550,7 @@ public class TeacherController {
 			if (assignmentStudent!=null) {
 				try {
 					if (dto.getSubmitEndDate()!=null && !StringUtils.isEmpty(dto.getSubmitEndDate())) {
+						assignmentStudent.setDateChange(true);
 						assignmentStudent.setSubmitEndDate(dateFormat.parse(dto.getSubmitEndDate()));
 					}
 				} catch (ParseException e) {
