@@ -31,8 +31,8 @@ public class EmailService {
 	
 	private static final String BACKGROUND_IMAGE = "email-templates/images/background.png";
     private static final String LOGO_BACKGROUND_IMAGE = "email-templates/images/logo-background.png";
-    private static final String THYMELEAF_BANNER_IMAGE = "email-templates/images/thymeleaf-banner.png";
-    private static final String THYMELEAF_LOGO_IMAGE = "email-templates/images/thymeleaf-logo.png";
+    private static final String ELEARNING_BANNER_IMAGE = "email-templates/images/eLearning_Banner.png";
+    private static final String ELEARNING_LOGO_IMAGE = "email-templates/images/eLearning_Logo.png";
     
     private static final String PNG_MIME = "image/png";
 	
@@ -63,8 +63,8 @@ public class EmailService {
 	            
 	            message.addInline("background", new ClassPathResource(BACKGROUND_IMAGE), PNG_MIME);
 	            message.addInline("logo-background", new ClassPathResource(LOGO_BACKGROUND_IMAGE), PNG_MIME);
-	            message.addInline("thymeleaf-banner", new ClassPathResource(THYMELEAF_BANNER_IMAGE), PNG_MIME);
-	            message.addInline("thymeleaf-logo", new ClassPathResource(THYMELEAF_LOGO_IMAGE), PNG_MIME);
+	            message.addInline("eLearning_Banner", new ClassPathResource(ELEARNING_BANNER_IMAGE), PNG_MIME);
+	            message.addInline("eLearning_Logo", new ClassPathResource(ELEARNING_LOGO_IMAGE), PNG_MIME);
 	            
 	            
 	            mailSender.send(message.getMimeMessage());
@@ -96,7 +96,7 @@ public class EmailService {
                      final Context ctx = new Context(locale);
                      
                      ctx.setVariable("assignmentCreator", assignmentUser.getFirstName()+" "+assignmentUser.getLastName());
-                     ctx.setVariable("name", user.getFirstName()+" "+user.getLastName()!=null?user.getLastName():" ");
+                     ctx.setVariable("name", user.getFirstName()+" "+user.getLastName());
                      ctx.setVariable("title", assignmentDto.getTitle());
                      ctx.setVariable("session", assignmentDto.getSession());
                      ctx.setVariable("startDate", assignmentDto.getSubmitStartDate());
@@ -109,8 +109,8 @@ public class EmailService {
                      
                     message.addInline("background", new ClassPathResource(BACKGROUND_IMAGE), PNG_MIME);
      	            message.addInline("logo-background", new ClassPathResource(LOGO_BACKGROUND_IMAGE), PNG_MIME);
-     	            message.addInline("thymeleaf-banner", new ClassPathResource(THYMELEAF_BANNER_IMAGE), PNG_MIME);
-     	            message.addInline("thymeleaf-logo", new ClassPathResource(THYMELEAF_LOGO_IMAGE), PNG_MIME);
+     	            message.addInline("eLearning_Banner", new ClassPathResource(ELEARNING_BANNER_IMAGE), PNG_MIME);
+     	            message.addInline("eLearning_Logo", new ClassPathResource(ELEARNING_LOGO_IMAGE), PNG_MIME);
      	            
                  }
              };

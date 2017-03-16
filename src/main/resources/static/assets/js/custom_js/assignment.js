@@ -56,6 +56,7 @@ $(document).ready(function () {
 	$('#assignmentForm').submit(function(event) {
 		saveAssignment(event);
 	});
+	
 });
 
  function saveAssignment(event){
@@ -82,8 +83,7 @@ $(document).ready(function () {
     });
 }
 
- $('button[data-loading-text]')
- .on('click', function () {
+ $('button[data-loading-text]').on('click', function () {
  	ajaxSetUp();
  });
  

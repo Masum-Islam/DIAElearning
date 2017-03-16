@@ -55,37 +55,38 @@
 
 						<div class="portlet-title">
 							
-							<div class="caption font-blue-sharp col-md-3">
+							<div class="col-md-4">
 								<i class="fa fa-sticky-note-o font-red-sunglo"
 									data-toggle="tooltip" data-placement="top"
-									title="Assignment Name"></i> <span class="caption-subject bold"
+									title="Assignment Name"></i> <span class="caption-subject font-blue-madison bold"
 									th:text="${assignment.title}">View Assignment</span>
 							</div>
 
-							<div class="caption font-blue-sharp col-md-2"
+							<div class="col-md-3"
 								data-toggle="tooltip" data-placement="top"
 								title="Last Date Of Submission">
 								<span class="fa fa-calendar-o font-red-sunglo "></span> <span
-									class="caption-subject bold"
+									class="caption-subject font-blue-madison"
 									th:text="${assignment.submitEndDate} ? ${#calendars.format(assignment.submitEndDate,'dd MMM yyyy hh:mm a')}">Assignment
 									Date Information</span>
 							</div>
 
-							<div class="caption font-blue-sharp col-md-2"
-								style="padding-left: 2%;" data-toggle="tooltip"
-								data-placement="top" title="Assignment Session">
-								<span class="font-red-sunglo bold">Session :</span> <span
-									class="caption-subject bold" th:text="${assignment.session}">Assignment
-									Session</span>
-							</div>
-
-							<div class="caption font-blue-sharp col-md-2"
-								style="padding-left: 2%;" data-toggle="tooltip"
-								data-placement="top" title="Assignment Status">
-								<span class="font-red-sunglo bold">Status :</span> <span
-									class="caption-subject bold"
-									th:text="${assignment.status==true?'Published':'Saved'}">Assignment
-									Status</span>
+							
+							<div class="col-md-4">
+								<div class="col-md-7" data-toggle="tooltip" data-placement="top"
+									title="Assignment Session">
+									<span class="font-red-sunglo bold">Session :</span> <span
+										class="caption-subject font-blue-madison"
+										th:text="${assignment.session}">Assignment Session</span>
+								</div>
+	
+								<div class="col-md-5" data-toggle="tooltip" data-placement="top"
+									title="Assignment Status">
+									<span class="font-red-sunglo bold">Status :</span> <span
+										class="caption-subject font-blue-madison"
+										th:text="${assignment.status==true?'Published':'Saved'}">Assignment
+										Status</span>
+								</div>
 							</div>
 
 							<div class="actions col-md-1">

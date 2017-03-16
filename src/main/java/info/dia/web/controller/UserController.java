@@ -14,14 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,12 +31,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.thymeleaf.TemplateEngine;
 
 import info.dia.authentication.IAuthenticationFacade;
 import info.dia.persistence.model.ImageEntity;
 import info.dia.persistence.model.User;
-import info.dia.persistence.model.VerificationToken;
 import info.dia.security.ActiveUserStore;
 import info.dia.security.ISecurityUserService;
 import info.dia.service.EmailService;
@@ -76,16 +71,6 @@ public class UserController {
     @Autowired 
     protected EmailService emailService;
     
-	@Autowired 
-	private TemplateEngine templateEngine;
-	
-    
-	@Autowired
-	private Environment env;
-	
-	
-	@Autowired
-    private JavaMailSender mailSender;
 	
 	@Autowired
 	private IImageService imageService;
@@ -130,13 +115,13 @@ public class UserController {
         }
         final String token = UUID.randomUUID().toString();
         userService.createPasswordResetTokenForUser(user, token);
-        final SimpleMailMessage email = constructResetTokenEmail(getAppUrl(request), request.getLocale(), token, user);
-        mailSender.send(email);
+        
         return new GenericResponse(messages.getMessage("message.resetPasswordEmail", null, request.getLocale()));
     }
     
     // Change password page
     @RequestMapping(value = "/user/changePassword", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('CHANGE_PASSWORD_PRIVILEGE')")
     public String showChangePasswordPage(final Locale locale, final Model model, @RequestParam("id") final long id, @RequestParam("token") final String token) {
     	LOGGER.info("/updatePassword method called....");
         final String result = securityUserService.validatePasswordResetToken(id, token);
@@ -267,29 +252,6 @@ public class UserController {
 
     
     // ============== NON-API ============
-    private SimpleMailMessage constructResendVerificationTokenEmail(final String contextPath, final Locale locale, final VerificationToken newToken, final User user) {
-        final String confirmationUrl = contextPath + "/registrationConfirm.html?token=" + newToken.getToken();
-        final String message = messages.getMessage("message.resendToken", null, locale);
-        return constructEmail("Resend Registration Token", message + " \r\n" + confirmationUrl, user);
-    }
-
-    private SimpleMailMessage constructResetTokenEmail(final String contextPath, final Locale locale, final String token, final User user) {
-        final String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
-        final String message = messages.getMessage("message.resetPassword", null, locale);
-        return constructEmail("Reset Password", message + " \r\n" + url, user);
-    }
-
-    private SimpleMailMessage constructEmail(String subject, String body, User user) {
-        final SimpleMailMessage email = new SimpleMailMessage();
-        email.setSubject(subject);
-        email.setText(body);
-        email.setTo(user.getEmail());
-        email.setFrom(env.getProperty("support.email"));
-        return email;
-    }
-    
-    private String getAppUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-    }
+   
     
 }

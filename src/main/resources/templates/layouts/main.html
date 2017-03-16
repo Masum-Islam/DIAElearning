@@ -14,15 +14,10 @@
         <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
         <!-- <link th:href="@{/assets/css/scrolling-nav.css}" rel="stylesheet"> -->
         <link th:href="@{/assets/css/style.css}" rel="stylesheet" type="text/css" />
-        
-        <link th:href="@{/assets/css/animate.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/bootstrap-dialog/css/bootstrap-dialog.min.css}" rel="stylesheet" type="text/css" />
-        
-        <link th:href="@{/assets/css/dropzone.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/profile.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/bootstrap-datetimepicker.min.css}" rel="stylesheet" type="text/css" />
-
-  
+		<link th:href="@{/assets/css/animate.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/bootstrap-switch.min.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/sticky-footer.css}" rel="stylesheet" type="text/css" />
         <link th:href="@{/assets/css/components-md.min.css}" rel="stylesheet" type="text/css" />
@@ -42,12 +37,9 @@
 			color:#000;
 		}
 	</style>
-
+	<link rel="shortcut icon" th:href="@{/assets/images/eLearning_Favicon.png}" />
 </head>
-<body  data-target=".navbar-fixed-top">
-		
-		
-		
+<body>
 		<!-- Fixed navbar -->
         <nav id="main_navbar" class="navbar navbar-default navbar-fixed-top" role="navigation">
             <div class="container">
@@ -89,7 +81,8 @@
 					    <li sec:authorize="hasAuthority('ADMIN_PRIVILEGE')" class="dropdown" th:class="${#httpServletRequest.getAttribute('controllerName') == 'Admin'} ? 'dropdown active' : 'dropdown'">
 					            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin<span class="caret"></span></a>
 					            <ul class="dropdown-menu">
-					                <li><a th:href="@{/admin/allUsers}">All Users</a></li>
+					                <li><a th:href="@{/admin/createUser}"><i class="fa fa-plus-circle"></i>Create User</a></li>
+					                <li><a th:href="@{/admin/allUsers}"><i class="fa fa-users"></i>All Users</a></li>
 					               <!--  <li><a th:href="@{/authorizationDocumentUpload}">Authorization Document Upload</a></li>				                
 					                <li><a th:href="@{/answerUpload}">Answer Submission</a></li> -->
 					            </ul>
@@ -176,10 +169,9 @@
 
     <script th:src="@{/assets/js/jquery.min.js}" type="text/javascript"></script>
     <script th:src="@{/assets/js/bootstrap.min.js}" type="text/javascript"></script>
-   <!--  <script th:src="@{/assets/js/moment.min.js}"></script> -->
+    <script th:src="@{/assets/js/moment.min.js}"></script>
     <!-- <script th:src="@{/assets/js/navberTransition.js}" type="text/javascript"></script> -->
     <script th:src="@{/assets/js/bootstrap-datetimepicker.js}"></script>
-    <script th:src="@{/assets/js/dropzone.js}" type="text/javascript"></script>
 	<script th:src="@{/assets/js/pwstrength.js}"></script>
     <script th:src="@{/assets/js/bootstrap-notify.min.js}"></script>
     <script th:src="@{/assets/bootstrap-dialog/js/bootstrap-dialog.min.js}"></script>
@@ -192,7 +184,7 @@
     <script th:src="@{/assets/js/multiselect.min.js}"></script>
     
     <!-- Custom Javascript -->
-    <script th:src="@{/assets/js/custom_js/dropzoneApp.js}" type="text/javascript"></script>
+    <!-- <script th:src="@{/assets/js/custom_js/dropzoneApp.js}" type="text/javascript"></script> -->
     <script th:src="@{/assets/js/custom_js/userController.js}" type="text/javascript"></script>
     <script th:src="@{/assets/js/custom_js/custom_summernote.js}"></script>
      
@@ -273,6 +265,8 @@ function editGroup(){
         
     });
 }
+
+
 
 /* $('.selectpicker').selectpicker({
 	  style: 'btn-info',

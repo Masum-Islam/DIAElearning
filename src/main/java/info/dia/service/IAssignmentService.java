@@ -20,12 +20,22 @@ public interface IAssignmentService {
 	
 	List<AssignmentInfoDto> findByUser(User user, Pageable pageable);
 	
-	List<AssignmentInfoDto> findByStatus(User user,boolean status,Pageable pageable);
+	Page<Assignment> getAllAssignmentByUserAndStatus(User user,boolean status,Pageable pageable);
+	
 	
 	Page<Assignment> searchRequests(User user,SearchDTO searchDTO, Pageable p);
 	
 	Assignment getAssignmentByIdAndUser(long id,long userId);
 	
 	Assignment findByUserAndTitleIgnoreCase(User user,String title);
+	
+	//Assignment Count By User
+	int countByUserId(long userId);
+	
+	//Assignment Count By User and true
+	int countByUserIdAndStatusTrue(long userId);
+	
+	//Assignment Count By User and false
+	int countByUserIdAndStatusFalse(long userId);
 	
 }

@@ -32,7 +32,7 @@
 						<div class="portlet-title">
 							<div class="caption font-red-sunglo">
 								<i class="icon-settings font-red-sunglo"></i> <span
-									class="caption-subject bold">Assignment List</span>
+									class="caption-subject font-blue-madison bold">Assignment List</span>
 							</div>
 							<div class="actions">
 								<div class="btn-group">
@@ -51,9 +51,6 @@
 					
 					
 					<th:block th:include="fragments/teacher/searchAssignment :: searchAssignment"></th:block>
-					
-					
-					
 					
 					<div id="no-more-tables" class="portlet-body form">
 
@@ -104,10 +101,10 @@
 
 										<!-- <td>Time Remains</td> -->
 										<td data-title="Actions" >
-											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File(s) To Assignment" th:href="@{/teacher/addDocument/} + ${assignmentInfoDto.id}"><span class="fa fa-files-o"></span></a>
-											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Student" th:href="@{/teacher/viewAssignment/(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
-											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit Assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
-											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download Assignment " th:href="@{/teacher/downloadStudentsAssignmentDocuments(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-download"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add assignment reference file(s) " th:href="@{/teacher/addDocument/} + ${assignmentInfoDto.id}"><span class="fa fa-files-o"></span></a>
+											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View assignment student" th:href="@{/teacher/viewAssignment(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-eye"></span></a>
+											<a class="btn btn-icon-only green" id="editAssignmentByUserAndId" data-toggle="tooltip" data-placement="top" title="Edit assignment "  th:href="@{/teacher/assignment/} + ${assignmentInfoDto.id}"><span class="glyphicon glyphicon-pencil"></span></a>
+											<a class="btn btn-icon-only grey-cascade" data-toggle="tooltip" data-placement="top" title="Download assignment " th:href="@{/teacher/downloadStudentsAssignmentDocuments(assignmentId=${assignmentInfoDto.id})}"><span class="fa fa-download"></span></a>
 											<!-- <a class="btn btn-icon-only red" data-toggle="tooltip" data-placement="top" title="Cancel Assignment" href="#"><span class="glyphicon glyphicon-stop"></span></a> -->
 										</td>
 									</tr>

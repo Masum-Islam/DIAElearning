@@ -1,7 +1,10 @@
 package info.dia.persistence.dao;
 
-import info.dia.persistence.model.Role;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import info.dia.persistence.model.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
@@ -9,4 +12,5 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 
     void delete(Role role);
 
+    List<Role> findAll();
 }

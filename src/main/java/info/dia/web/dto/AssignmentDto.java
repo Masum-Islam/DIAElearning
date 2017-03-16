@@ -18,7 +18,7 @@ public class AssignmentDto implements Serializable{
 	private long id;
 	
 	@NotNull(message="{NotNull.assignmentDto.title}")
-    @Size(min = 1,max=30,message="{Size.assignmentDto.title}")
+    @Size(min = 1,max=50,message="{Size.assignmentDto.title}")
 	private String title;
 	
 	@NotNull(message="{NotNull.assignmentDto.session}")

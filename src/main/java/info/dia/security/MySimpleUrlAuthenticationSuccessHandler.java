@@ -66,27 +66,34 @@ public class MySimpleUrlAuthenticationSuccessHandler implements AuthenticationSu
 
     protected String determineTargetUrl(final Authentication authentication) {
         
-    	boolean isUser = false;
-        boolean isAdmin = false;
+    	boolean isAdmin = false;
+    	boolean isTeacher = false;
+    	boolean isStudent = false;
         
         final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         
         for (final GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals("READ_PRIVILEGE")) {
-                isUser = true;
-            } else if (grantedAuthority.getAuthority().equals("WRITE_PRIVILEGE")) {
-                isAdmin = true;
-                isUser = false;
+            if (grantedAuthority.getAuthority().equals("TEACHER_PRIVILEGE")) {
+            	isTeacher = true;
+            } else if (grantedAuthority.getAuthority().equals("STUDENT_PRIVILEGE")) {
+            	isStudent = true;
+                isTeacher = false;
                 break;
-            }
+            } else if (grantedAuthority.getAuthority().equals("ADMIN_PRIVILEGE")) {
+            	isAdmin = true;
+            	isTeacher = false;
+            	isStudent = false;
+			}
         }
-        if (isUser) {
-        	 logger.info("User :"+authentication.getName());
+        if (isTeacher) {
+        	 logger.info("Teacher :"+authentication.getName());
             return "/home?user=" + authentication.getName();
-           
-        } else if (isAdmin) {
-        	 logger.info("Admin :"+authentication.getName());
+        } else if (isStudent) {
+        	 logger.info("Student :"+authentication.getName());
             return "/home?user=" + authentication.getName();
+        }else if (isAdmin) {
+       	 logger.info("Admin :"+authentication.getName());
+         return "/home?user=" + authentication.getName();
         } else {
             throw new IllegalStateException();
         }

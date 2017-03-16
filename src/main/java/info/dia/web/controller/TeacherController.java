@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,8 +33,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -187,7 +184,9 @@ public class TeacherController {
 	
 	
 	@RequestMapping(value="/assignments", method=RequestMethod.GET)
-	public String allAssignmentInformationByUser(Model model,@RequestParam(value = "page", required = false) Integer page,
+	public String allAssignmentInformationByUser(Model model,
+			@RequestParam(value = "status", required = false) Boolean status,
+			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "sortString", required = false) String sortString,
 			@RequestParam(value = "oldSortString", required = false) String oldSortString,
 			@RequestParam(value = "oldDirection", required = false) Direction oldDirection){
@@ -196,15 +195,18 @@ public class TeacherController {
 		    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
 		    		
 		    		User user = userService.findUserByEmail(authentication.getName());
-		    		
+		    		Page<Assignment> assignments = null;
 		    		PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
 		    		
-		    		Page<Assignment> assignments = assignmentRepository.findByUser(user,pageRequest);
+		    		LOGGER.info("Status :"+status);
 		    		
-		    		/*LOGGER.info("User email 1:"+user.getEmail()+" Search Find :"+assignments.getTotalElements());*/
+		    		if (status!=null) {
+						assignments = assignmentService.getAllAssignmentByUserAndStatus(user,status,pageRequest);
+					}else {
+						assignments = assignmentRepository.findAllByUser(user,pageRequest);
+					}
 		    		
 		    		List<AssignmentInfoDto> assignmentInfoDtos = AssignmentMapper.map(assignments);
-		    		
 		    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignments.getTotalPages(),assignments.getNumber(),BUTTONS_TO_SHOW);
 		    		
 		    		model.addAttribute("assignmentInfoDtos", assignmentInfoDtos);
@@ -215,74 +217,6 @@ public class TeacherController {
 		     }
 		return "/teacher/assignmentList";
 	}
-	
-	
-	
-	//Assignment Document
-	@RequestMapping(value="/addDocument/{assignmentId}",method=RequestMethod.GET)
-	public String addDocumentsToAssignment(Model model,@PathVariable Long assignmentId){
-		
-		DocumentDto documentDto = new DocumentDto();
-		documentDto.setAssignmentId(assignmentId);
-		
-		
-		List<DocumentDto> assignmentsDocuments = new ArrayList<>();
-		Authentication authentication = authenticationFacade.getAuthentication();
-    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
-    		User assignmentUser = userService.findUserByEmail(authentication.getName());
-    		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId, assignmentUser.getId());
-    		if(assignment!=null){
-    			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
-    			if (documents.size()>0) {
-    				assignmentsDocuments = DocumentMapper.map(documents);
-    				/*LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());*/
-				}
-    		}
-    	}
-    	
-		model.addAttribute("assignmentDocument", documentDto);
-		model.addAttribute("assignmentsDocuments", assignmentsDocuments);
-		
-		return "/teacher/addDocument";
-	}
-	
-	
-	  @RequestMapping(value = "/uploadAssignmentDocument", method = RequestMethod.POST)
-	  public @ResponseBody List<DocumentDto> upload(MultipartHttpServletRequest request,HttpServletResponse response,@RequestParam(value="assignmentId") Long assignmentId) throws IOException {
-
-		Authentication authentication = authenticationFacade.getAuthentication();
-		List<DocumentDto> uploadedFiles = null;
-    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
-    		
-    		User user = userService.findUserByEmail(authentication.getName());
-    		
-    		// Getting uploaded files from the request object
-    	    Map<String, MultipartFile> fileMap = request.getFileMap();
-
-    	    // Maintain a list to send back the files info. to the client side
-    	    uploadedFiles = new ArrayList<DocumentDto>();
-
-    	    // Iterate through the map
-    	    for (MultipartFile multipartFile : fileMap.values()) {
-
-    	      // Save the file to local disk
-    	      saveFileToLocalDisk(multipartFile,user);
-
-    	      LOGGER.info("Assignment Id :"+assignmentId);
-    	      
-    	      DocumentDto fileInfo = getUploadedFileInfo(multipartFile,user,assignmentId);
-    	      
-    	      // Save the file info to database
-    	      Document document = saveFileToDatabase(fileInfo);
-
-    	      // adding the file info to the list
-    	      uploadedFiles.add(fileInfo);
-    	    }
-    	    
-    	}
-	    return uploadedFiles;
-	  }
-	
 	
 	@RequestMapping(value = "/assignments/search",method=RequestMethod.GET)
 	public String search(
@@ -337,6 +271,77 @@ public class TeacherController {
 	}
 	
 	
+	
+	//Assignment Document
+	@RequestMapping(value="/addDocument/{assignmentId}",method=RequestMethod.GET)
+	public String addDocumentsToAssignment(Model model,@PathVariable Long assignmentId){
+		
+		DocumentDto documentDto = new DocumentDto();
+		documentDto.setAssignmentId(assignmentId);
+		Assignment assignment = null;
+		
+		List<DocumentDto> assignmentsDocuments = new ArrayList<>();
+		Authentication authentication = authenticationFacade.getAuthentication();
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		User assignmentUser = userService.findUserByEmail(authentication.getName());
+    		assignment = assignmentService.getAssignmentByIdAndUser(assignmentId, assignmentUser.getId());
+    		if(assignment!=null){
+    			
+    			List<Document> documents = uploadService.getAllDocumentsByAssignmenmt(assignment);
+    			if (documents.size()>0) {
+    				assignmentsDocuments = DocumentMapper.map(documents);
+    				/*LOGGER.info("assignmentsDocuments size :"+assignmentsDocuments.size());*/
+				}
+    		}
+    	}
+    	model.addAttribute("assignment", assignment);
+		model.addAttribute("assignmentDocument", documentDto);
+		model.addAttribute("assignmentsDocuments", assignmentsDocuments);
+		
+		return "/teacher/addDocument";
+	}
+	
+	
+	  @RequestMapping(value = "/uploadAssignmentDocument", method = RequestMethod.POST)
+	  public @ResponseBody List<DocumentDto> upload(MultipartHttpServletRequest request,HttpServletResponse response,@RequestParam(value="assignmentId") Long assignmentId) throws IOException {
+
+		Authentication authentication = authenticationFacade.getAuthentication();
+		List<DocumentDto> uploadedFiles = null;
+    	if (!(authentication instanceof AnonymousAuthenticationToken)) {
+    		
+    		User user = userService.findUserByEmail(authentication.getName());
+    		
+    		// Getting uploaded files from the request object
+    	    Map<String, MultipartFile> fileMap = request.getFileMap();
+
+    	    // Maintain a list to send back the files info. to the client side
+    	    uploadedFiles = new ArrayList<DocumentDto>();
+
+    	    // Iterate through the map
+    	    for (MultipartFile multipartFile : fileMap.values()) {
+
+    	      // Save the file to local disk
+    	      saveFileToLocalDisk(multipartFile,user);
+
+    	      LOGGER.info("Assignment Id :"+assignmentId);
+    	      
+    	      DocumentDto fileInfo = getUploadedFileInfo(multipartFile,user,assignmentId);
+    	      
+    	      // Save the file info to database
+    	      Document document = saveFileToDatabase(fileInfo);
+
+    	      // adding the file info to the list
+    	      uploadedFiles.add(fileInfo);
+    	    }
+    	    
+    	}
+	    return uploadedFiles;
+	  }
+	
+	
+	
+	
+	
 	@RequestMapping(value="/assignment/{id}",method=RequestMethod.GET)
 	public String editAssignment(Model model,@PathVariable("id") long id){
 		
@@ -385,7 +390,7 @@ public class TeacherController {
 		return viewPage;
 	}
 	
-	@RequestMapping(value="/viewAssignment/")
+	@RequestMapping(value="/viewAssignment")
 	public String viewAssignment(Model model,
 			@RequestParam(value = "assignmentId", required = true) Long assignmentId,
 			@RequestParam(value = "page", required = false) Integer page,
@@ -402,27 +407,26 @@ public class TeacherController {
     		/*LOGGER.info("Assignment Id:"+assignmentId);*/
     		
     		Assignment assignment = assignmentService.getAssignmentByIdAndUser(assignmentId,currentUser.getId());
-    		
-    		PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
-    		
-    		Page<AssignmentStudent> assignmentStudents = assignmentStudentService.findAllByAssignment(assignment,pageRequest);
-    		List<AssignmentStudentInfo> assignmentStudentInfos = AssignmentStudentMapper.map(assignmentStudents);
-    		
-    		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignmentStudents.getTotalPages(),assignmentStudents.getNumber(),BUTTONS_TO_SHOW);
-    		
-    		int totalAssignmentSubmittedStudents = assignmentSubmittedCount(assignmentStudentInfos);
-    		
-    		model.addAttribute("assignment", assignment);
-    		model.addAttribute("assignmentStudents", assignmentStudents);
-    		model.addAttribute("totalAssignmentStudents", assignmentStudents.getTotalElements());
-    		model.addAttribute("totalAssignmentSubmittedStudents",totalAssignmentSubmittedStudents);
-    		model.addAttribute("assignmentStudentInfos", assignmentStudentInfos);
-    		model.addAttribute("pager", pager);
-    		model.addAttribute("searchDTO", new SearchDTO());
+    		if (assignment!=null) {
+    			PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+        		
+        		Page<AssignmentStudent> assignmentStudents = assignmentStudentService.findAllByAssignment(assignment,pageRequest);
+        		List<AssignmentStudentInfo> assignmentStudentInfos = AssignmentStudentMapper.map(assignmentStudents);
+        		
+        		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(assignmentStudents.getTotalPages(),assignmentStudents.getNumber(),BUTTONS_TO_SHOW);
+        		
+        		int totalAssignmentSubmittedStudents = assignmentSubmittedCount(assignmentStudentInfos);
+        		
+        		model.addAttribute("assignment", assignment);
+        		model.addAttribute("assignmentStudents", assignmentStudents);
+        		model.addAttribute("totalAssignmentStudents", assignmentStudents.getTotalElements());
+        		model.addAttribute("totalAssignmentSubmittedStudents",totalAssignmentSubmittedStudents);
+        		model.addAttribute("assignmentStudentInfos", assignmentStudentInfos);
+        		model.addAttribute("pager", pager);
+        		model.addAttribute("searchDTO", new SearchDTO());
+			}
     		
 		}
-		
-		
 		return "/teacher/viewAssignment";
 	}
 	

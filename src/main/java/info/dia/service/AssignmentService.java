@@ -10,6 +10,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -22,6 +23,7 @@ import org.springframework.util.StringUtils;
 import com.mysema.query.BooleanBuilder;
 
 import info.dia.authentication.IAuthenticationFacade;
+import info.dia.event.EmailEvent;
 import info.dia.persistence.dao.AssignmentRepository;
 import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.dao.GroupRepository;
@@ -65,6 +67,10 @@ public class AssignmentService implements IAssignmentService{
 	
 	
 	@Autowired
+	private ApplicationEventPublisher eventPublisher;
+	
+	
+	@Autowired
     private RoleRepository roleRepository;
 	
 	
@@ -89,6 +95,8 @@ public class AssignmentService implements IAssignmentService{
     			
     			Assignment assignment = assignmentRepository.findOne(assignmentDto.getId());
     			
+    			LOGGER.info("assignment status :"+assignment.getStatus());
+    			
     			List<User> sendEmailUserList = new ArrayList<User>();
     			
     			List<User> newEmailUserList = new ArrayList<User>();
@@ -96,7 +104,6 @@ public class AssignmentService implements IAssignmentService{
     			assignment.setTitle(assignmentDto.getTitle());
     			assignment.setSession(assignmentDto.getSession());
     			assignment.setInstructions(assignmentDto.getInstructions());
-    			assignment.setStatus(assignmentDto.getStatus());
     			assignment.setUser(assignmentUser);
     			assignment.setSubmitStartDate(assignmentDto.getSubmitStartDate());
     			assignment.setSubmitEndDate(assignmentDto.getSubmitEndDate());
@@ -113,13 +120,14 @@ public class AssignmentService implements IAssignmentService{
         				
         				if (existsAssignmentStudent!=null) {
         					
+        					User existsAssignmentUser = userService.findUserByEmail(existsAssignmentStudent.getEmail());
+        					sendEmailUserList.add(existsAssignmentUser);
+        					
         					if (!existsAssignmentStudent.isDateChange()) {
         						existsAssignmentStudent.setSubmitStartDate(assignmentDto.getSubmitStartDate());
         						existsAssignmentStudent.setSubmitEndDate(assignmentDto.getSubmitEndDate());
 							}
         					assignmentStudents.add(existsAssignmentStudent);
-        					
-        					
 						}else {
 							
 							AssignmentStudent assignmentStudent = new AssignmentStudent();
@@ -169,14 +177,18 @@ public class AssignmentService implements IAssignmentService{
     			
     			// Sent email
     			if (assignment.getStatus()==false && assignmentDto.getStatus()==true) {
-					emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);
+    				
+    				LOGGER.info("Assignment Status in 1st: "+assignmentDto.getStatus()+"---->"+assignment.getStatus());
+					/*emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);*/
+    				eventPublisher.publishEvent(new EmailEvent(sendEmailUserList, assignmentDto, assignmentUser));
+					
 				}else if (assignment.getStatus()==true) {
 					
-					LOGGER.info("Assignment Status: "+assignmentDto.getStatus());
+					LOGGER.info("Assignment Status in 2nd:"+assignmentDto.getStatus());
 					
 					for (AssignmentStudent assignmentStudent : assignmentStudents) {
 						
-						LOGGER.info("Assignment Status: "+assignmentStudent.getEmail());
+						/*LOGGER.info("Assignment Status: "+assignmentStudent.getEmail());*/
 						
 	    				boolean result = isObjectInSet(assignmentStudent,assignment.getAssignmentStudents());
 	    				
@@ -187,15 +199,16 @@ public class AssignmentService implements IAssignmentService{
 								newEmailUserList.add(newEmailuser);
 							}
 						}
-	    				
 					}
 					
 					if (newEmailUserList.size()>0) {
 						LOGGER.info("New Entry Email size :"+newEmailUserList.size());
-						emailService.sendAssignmentNotification(newEmailUserList,assignmentDto,assignmentUser);
+						/*emailService.sendAssignmentNotification(newEmailUserList,assignmentDto,assignmentUser);*/
+						eventPublisher.publishEvent(new EmailEvent(newEmailUserList, assignmentDto, assignmentUser));
 					}
 				}
     			
+    			assignment.setStatus(assignmentDto.getStatus());
     			assignment.setAssignmentStudents(assignmentStudents);
     			assignmentRepository.save(Arrays.asList(assignment));
     			
@@ -257,7 +270,8 @@ public class AssignmentService implements IAssignmentService{
 				
 				// Sent email
 				if (assignmentDto.getStatus()==true) {
-					emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);
+					/*emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);*/
+					eventPublisher.publishEvent(new EmailEvent(sendEmailUserList,assignmentDto,assignmentUser));
 				}
 			}
     	}
@@ -275,7 +289,7 @@ public class AssignmentService implements IAssignmentService{
     		
     		User assignmentUser = userService.findUserByEmail(authentication.getName());
     		
-    		Page<Assignment> assignments = assignmentRepository.findByUser(assignmentUser,pageable);
+    		Page<Assignment> assignments = assignmentRepository.findAllByUser(assignmentUser,pageable);
 
 			assignmentInfoDtos = AssignmentMapper.map(assignments);
 
@@ -299,14 +313,6 @@ public class AssignmentService implements IAssignmentService{
 
 		   return result;
 	}
-
-
-	@Override
-	public List<AssignmentInfoDto> findByStatus(User user, boolean status, Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	@Override
 	public Page<Assignment> searchRequests(User user, SearchDTO searchDTO, Pageable p) {
@@ -349,7 +355,7 @@ public class AssignmentService implements IAssignmentService{
 		
 		final Role studentRole = roleRepository.findByName("ROLE_STUDENT");
         final User user = new User();
-        user.setFirstName("Student");
+        /*user.setFirstName("Student");*/
         /*user.setLastName("Test");*/
         user.setPassword(passwordEncoder.encode(email));
         user.setEmail(email);
@@ -393,5 +399,33 @@ public class AssignmentService implements IAssignmentService{
 	@Override
 	public Assignment getAssignmentById(long assignmentId) {
 		return assignmentRepository.findOne(assignmentId);
+	}
+
+
+	@Override
+	public int countByUserId(long userId) {
+		// TODO Assignment count by user
+		return assignmentRepository.countByUserId(userId);
+	}
+
+
+	@Override
+	public int countByUserIdAndStatusTrue(long userId) {
+		// TODO Assignment count by user and true
+		return assignmentRepository.countByUserIdAndStatusTrue(userId);
+	}
+
+
+	@Override
+	public int countByUserIdAndStatusFalse(long userId) {
+		// TODO Assignment count by user and false
+		return assignmentRepository.countByUserIdAndStatusFalse(userId);
+	}
+
+
+	@Override
+	public Page<Assignment> getAllAssignmentByUserAndStatus(User user, boolean status, Pageable pageable) {
+		// TODO Assignments by User and Status
+		return assignmentRepository.findAllByUserAndStatus(user, status, pageable);
 	}
 }

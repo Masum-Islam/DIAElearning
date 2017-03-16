@@ -18,7 +18,7 @@ $(document).ready(function() {
 	          ['color', ['color']],
 	          ['para', ['ul', 'ol', 'paragraph']],
 	          ['height', ['height']],
-	          ['insert', ['picture', 'link', 'table', 'hr']],
+	          ['insert', ['link', 'table', 'hr']],
 	          ['Misc', ['fullscreen', 'undo', 'redo', 'help']]
 	        ]
       });

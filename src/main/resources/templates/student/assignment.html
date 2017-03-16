@@ -20,7 +20,7 @@
 					<div class="portlet-title">
 						<div class="caption font-red-sunglo">
 							<i class="icon-settings font-red-sunglo"></i> <span
-								class="caption-subject bold">Assignment Details</span>
+								class="caption-subject font-blue-madison bold">Assignment Details</span>
 						</div>
 						<div class="actions">
 							<div class="btn-group">
@@ -42,7 +42,7 @@
 									<span th:text="${assignmentStudent.assignment.title}"></span>
 								</div>
 								<div class="actions">
-									<a th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}" class="btn btn-default btn-sm"> <i
+									<a th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}" class="btn btn-info btn-sm"> <i
 										class="fa fa-pencil"></i>Submit Assignment
 									</a>
 								</div>

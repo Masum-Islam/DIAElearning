@@ -125,6 +125,34 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	}
 
 
+	@Override
+	public int countByEmail(String email) {
+		// TODO Count Student Assignment by email
+		return assignmentStudentRepository.countByEmail(email);
+	}
+
+
+	@Override
+	public int countByEmailAndStatusTrue(String email) {
+		// TODO Count Student Assignment by email and true
+		return assignmentStudentRepository.countByEmailAndStatusTrue(email);
+	}
+
+
+	@Override
+	public int countByEmailAndStatusFalse(String email) {
+		// TODO Count Student Assignment by email and false
+		return assignmentStudentRepository.countByEmailAndStatusFalse(email);
+	}
+
+
+	@Override
+	public Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,boolean status,Pageable pageable) {
+		// TODO Assignment student by email and status
+		return assignmentStudentRepository.findAllByEmailAndStatus(email,status,pageable);
+	}
+
+
 	
 
 }

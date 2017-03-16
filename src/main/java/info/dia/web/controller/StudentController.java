@@ -130,7 +130,9 @@ public class StudentController {
 	
 	
 	@RequestMapping(value="/assignments",method=RequestMethod.GET)
-	public String assignments(Model model,@RequestParam(value = "page", required = false) Integer page,
+	public String assignments(Model model,
+			@RequestParam(value = "status", required = false) Boolean status,
+			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "sortString", required = false) String sortString,
 			@RequestParam(value = "oldSortString", required = false) String oldSortString,
 			@RequestParam(value = "oldDirection", required = false) Direction oldDirection){
@@ -142,10 +144,17 @@ public class StudentController {
 			
 			User currentUser = userService.findUserByEmail(authentication.getName());
 			PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+			Page<AssignmentStudent> studentAssignments = null;
 			
-			Page<AssignmentStudent> studentAssignments = assignmentStudentService.getAllStudentAssignmentByEmailAndAssignmentStatusTrue(currentUser.getEmail(),pageRequest);
+			/*LOGGER.info("Status :"+status);*/
 			
-			LOGGER.info("Student Assignment Size:"+studentAssignments.getTotalElements());
+			if (status!=null) {
+				studentAssignments = assignmentStudentService.getAllStudentAssignmentByEmailAndAssignmentStatus(currentUser.getEmail(),status,pageRequest);
+				LOGGER.info("Status :"+status+" and studentsAssignments :"+studentAssignments.getTotalElements());
+			}else {
+				studentAssignments = assignmentStudentService.getAllStudentAssignmentByEmailAndAssignmentStatusTrue(currentUser.getEmail(),pageRequest);
+			}
+			
 			
 			info.dia.web.util.Pager pager = new info.dia.web.util.Pager(studentAssignments.getTotalPages(),studentAssignments.getNumber(),BUTTONS_TO_SHOW);
 			
@@ -207,18 +216,19 @@ public class StudentController {
 	}
 	
 	
-		//Student Assignment Document
+	//Student Assignment Document
 	@RequestMapping(value="/addDocument",method=RequestMethod.GET)
 	public String addDocumentsToAssignment(Model model,@RequestParam(value="assignmentStudentId") Long assignmentStudentId,@RequestParam(value="assignmentId") Long assignmentId){
-			
-			LOGGER.info("AssignmentId :"+assignmentId+" Assignment Student Id :"+assignmentStudentId);
 		
 			Authentication authentication = authenticationFacade.getAuthentication();
 			StudentDocumentDto studentDocumentDto = null;
 			Document document = null;
+			Assignment documentSubmitOnAssignment = null;
+			
 			if (!(authentication instanceof AnonymousAuthenticationToken)) {
-				
 				User user = userService.findUserByEmail(authentication.getName());
+				
+				documentSubmitOnAssignment = assignmentService.getAssignmentById(assignmentId);
 				
 				studentDocumentDto = new StudentDocumentDto();
 				studentDocumentDto.setAssignmentId(assignmentId);
@@ -228,8 +238,8 @@ public class StudentController {
 				if (document!=null) {
 					studentDocumentDto.setId(document.getId());
 				}
-				
 			}
+		model.addAttribute("documentSubmitOnAssignment",documentSubmitOnAssignment);	
 		model.addAttribute("studentDocumentDto",studentDocumentDto);
 		model.addAttribute("document",document);
 			

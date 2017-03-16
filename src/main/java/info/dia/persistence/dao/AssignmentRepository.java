@@ -10,8 +10,11 @@ import info.dia.persistence.model.User;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long>,QueryDslPredicateExecutor<Assignment>{
 
+	//Assignment by user
+	Page<Assignment> findAllByUser(User user,Pageable pageable);
 	
-	Page<Assignment> findByUser(User user,Pageable pageable);
+	Page<Assignment> findAllByUserAndStatus(User user,boolean status,Pageable pageable);
+	
 	
 	Page<Assignment> findByTitleLikeIgnoreCase(User user,String title,Pageable pageable);
 	
@@ -20,5 +23,11 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long>,Qu
 	Assignment findByIdAndUserId(long id,long userId);
 	
 	Assignment findByUserAndTitleIgnoreCase(User user,String title);
+	
+	int countByUserId(long userId);
+	
+	int countByUserIdAndStatusTrue(long userId);
+	
+	int countByUserIdAndStatusFalse(long userId);
 	
 }

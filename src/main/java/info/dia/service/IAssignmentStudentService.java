@@ -17,6 +17,8 @@ public interface IAssignmentStudentService {
 	
 	Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatusTrue(String email,Pageable pageable);
 	
+	Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,boolean status,Pageable pageable);
+	
 	AssignmentStudent saveOrUpdate(AssignmentStudent assignmentStudent);
 	
 	AssignmentStudent getAssignmentStudentByEmailAndAssignmentId(String email,Long assignmentId);
@@ -24,5 +26,14 @@ public interface IAssignmentStudentService {
 	AssignmentStudent getAssignmentStudentByIdAndEmail(Long assignmentStudentId,String email);
 	
 	Page<AssignmentStudent> searchAssignmentStudentByStudent(String email,SearchDTO searchDTO, Pageable p);
+	
+	// Count Student Assignment by email
+	int countByEmail(String email);
+
+	// Count Student Assignment by email and true
+	int countByEmailAndStatusTrue(String email);
+
+	// Count Student Assignment by email and false
+	int countByEmailAndStatusFalse(String email);
 
 }

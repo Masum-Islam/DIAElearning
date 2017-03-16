@@ -16,8 +16,20 @@ public interface AssignmentStudentRepository extends JpaRepository<AssignmentStu
 	
 	Page<AssignmentStudent> findAllByEmailAndAssignmentStatusTrue(String email,Pageable pageable);
 	
+	Page<AssignmentStudent> findAllByEmailAndStatus(String email,boolean status,Pageable pageable);
+	
 	AssignmentStudent findByEmailAndAssignmentId(String email,Long assignmentId);
 	
 	AssignmentStudent findByIdAndEmail(Long assignmentStudentId,String email);
+	
+	// Count Student Assignment by email
+	int countByEmail(String email);
+	
+	// Count Student Assignment by email and true
+	int countByEmailAndStatusTrue(String email);
+	
+	// Count Student Assignment by email and false
+	int countByEmailAndStatusFalse(String email);
+
 	
 }

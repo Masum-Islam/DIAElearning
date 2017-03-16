@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	layout:decorator="layouts/main">
+<head>
+<meta charset="ISO-8859-1">
+<title th:text="#{label.pages.admin.createUser}">Create User</title>
+</head>
+<body>
+	
+	<th:block layout:fragment="script">
+           
+           <link th:href="@{/assets/selectize/css/selectize.default.css}" rel="stylesheet" type="text/css" />
+           <script th:src="@{/assets/selectize/js/standalone/selectize.js}"></script>
+           <script th:src="@{/assets/js/custom_js/users.js}"></script>
+           
+	</th:block>
+	
+	
+	<div layout:fragment="content">
+		<div class="page-content-inner">
+			<div class="row">
+				<div>
+					<!-- BEGIN SAMPLE FORM PORTLET-->
+					<div class="portlet light ">
+						<div class="portlet-title">
+							<div class="caption font-red-sunglo">
+								<i class="icon-settings font-red-sunglo"></i> <span
+									class="caption-subject font-blue-madison bold">Create User</span>
+							</div>
+							<div class="actions">
+								<div class="btn-group">
+									<a class="btn btn-sm green btn-outline dropdown-toggle" href="javascript:;"
+										data-toggle="dropdown"> Actions <i
+										class="fa fa-angle-down"></i>
+									</a>
+									<ul class="dropdown-menu pull-right">
+										<li><a th:href="@{/admin/allUsers}"><i class="fa fa-users"></i>View All Users</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="portlet-body form">
+							<!-- action="@{/teacher/assignment}" method="post" -->
+							<form role="form" id="assignmentForm" th:object="${users}"  >
+								<div class="form-body">
+									<div class="row">
+										<div class="col-md-8">
+											<!--Column left-->
+											<div class="control-group">
+												<label for="select-to">User(s):</label> 
+												<input id="select-to" th:field="*{emails}" class="contacts" value=""  name="emails[]" multiple  placeholder="Write email...">
+											</div>
+										</div>
+
+										<div class="col-md-2">
+											<!--Column right-->
+											<div class="control-group">
+												<label for="select-role">Role:</label>
+												<select id="select-role" placeholder="Select a role...">
+													<option value="">Select a role...</option>
+													<option th:each="role : *{roles}" th:value="${role.id}" th:text="${role.name}">Role</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-2">
+											<div class="form-actions" style="text-align: right;">
+												<button type="submit" id="create-user"
+													class="btn btn-primary">Create User(s)</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+	</div>
+
+</body>
+</html>
