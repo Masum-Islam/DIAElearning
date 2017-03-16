@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title data-th-remove="all">Daffodil E-learning | Assignment Information</title>
+        <title data-th-remove="all">DIA Puzzle Hunt | Registration</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
@@ -17,34 +17,21 @@
                         <div style="background-image: url(images/logo-background.png);"
                              data-th-style="|background-image: url(cid:logo-background)|">
                             <img style="border: solid 1px #555; border-radius: 6px;"
-                                 src="images/eLearning_Banner.png" data-th-src="|cid:eLearning_Banner|" />
+                                src="images/thymeleaf-banner.png" data-th-src="|cid:thymeleaf-banner|" />
                         </div>
                     </div>
                     
                     <div style="padding: 15px 15px 30px 15px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size:1em; background-color: #fff; color:#333;">
-                        <p>Dear <b data-th-text="${name}?${name}:'Student'">Peter</b>!</p>
-                       	
-                       	
-					<table border="1" width="100%">
-						<caption>Assignment Information.</caption>
-						<tr>
-							<td>Title</td>
-							<td th:text="${title}">title</td>
-						</tr>
-						<tr>
-							<td>Session</td>
-							<td th:text="${session}">session</td>
-						</tr>
-						<tr>
-							<td>Last Date Of Submission</td>
-							<td th:text="${endDate}">end date</td>
-						</tr>
-					</table>
-
-
-						<p>
-                            
-                        </p>
+                        <p>Dear <b data-th-text="${assignmentCreator}">Sir</b>,</p>
+                       
+                       <p> <b data-th-text="${studentName}"> Pranto </b> associated with <b data-th-text="${studentEmail}"> pranto@daffodil.ac</b> has successfully 
+                       submitted his/her assignment on <b data-th-text="${title}"> Title</b> at <b data-th-text="${todayDate}"> Today</b> .</p>	
+                      
+                     <p>For assignment details <b><a th:href="${viewAssignmentUrl}">click here !</a></b></p> 
+                    
+					<p>
+                        * This is an automatically generated email.Please do not reply to it.
+                    </p>
                         
                     </div>
                     
@@ -53,7 +40,7 @@
                         <div style="background-image: url(images/logo-background.png);"
                              data-th-style="|background-image: url(cid:logo-background)|">
                             <img style="border: solid 1px #555; border-radius: 6px;"
-                                 src="images/eLearning_Logo.png" data-th-src="|cid:eLearning_Logo|" />
+                                src="images/thymeleaf-logo.png" data-th-src="|cid:thymeleaf-logo|" />
                         </div>
                     </div>
                     
