@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 import com.mysema.query.BooleanBuilder;
 
 import info.dia.authentication.IAuthenticationFacade;
-import info.dia.event.EmailEvent;
+import info.dia.event.AssignmentEmailNotificationEvent;
 import info.dia.persistence.dao.AssignmentRepository;
 import info.dia.persistence.dao.AssignmentStudentRepository;
 import info.dia.persistence.dao.GroupRepository;
@@ -180,7 +180,7 @@ public class AssignmentService implements IAssignmentService{
     				
     				LOGGER.info("Assignment Status in 1st: "+assignmentDto.getStatus()+"---->"+assignment.getStatus());
 					/*emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);*/
-    				eventPublisher.publishEvent(new EmailEvent(sendEmailUserList, assignmentDto, assignmentUser));
+    				eventPublisher.publishEvent(new AssignmentEmailNotificationEvent(sendEmailUserList, assignmentDto, assignmentUser));
 					
 				}else if (assignment.getStatus()==true) {
 					
@@ -204,7 +204,7 @@ public class AssignmentService implements IAssignmentService{
 					if (newEmailUserList.size()>0) {
 						LOGGER.info("New Entry Email size :"+newEmailUserList.size());
 						/*emailService.sendAssignmentNotification(newEmailUserList,assignmentDto,assignmentUser);*/
-						eventPublisher.publishEvent(new EmailEvent(newEmailUserList, assignmentDto, assignmentUser));
+						eventPublisher.publishEvent(new AssignmentEmailNotificationEvent(newEmailUserList, assignmentDto, assignmentUser));
 					}
 				}
     			
@@ -271,7 +271,7 @@ public class AssignmentService implements IAssignmentService{
 				// Sent email
 				if (assignmentDto.getStatus()==true) {
 					/*emailService.sendAssignmentNotification(sendEmailUserList,assignmentDto,assignmentUser);*/
-					eventPublisher.publishEvent(new EmailEvent(sendEmailUserList,assignmentDto,assignmentUser));
+					eventPublisher.publishEvent(new AssignmentEmailNotificationEvent(sendEmailUserList,assignmentDto,assignmentUser));
 				}
 			}
     	}

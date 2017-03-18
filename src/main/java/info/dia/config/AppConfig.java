@@ -18,7 +18,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 @Configuration
-@ComponentScan(basePackages = { "info.dia.registration" })
+@ComponentScan(basePackages = { "info.dia" })
 @PropertySource("classpath:email.properties")
 public class AppConfig {
 	

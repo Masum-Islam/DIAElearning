@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent;
 import info.dia.persistence.model.User;
 import info.dia.web.dto.AssignmentDto;
 
-public class EmailEvent extends ApplicationEvent {
+public class AssignmentEmailNotificationEvent extends ApplicationEvent {
 
 
 	private static final long serialVersionUID = 2397961244247087481L;
@@ -16,7 +16,8 @@ public class EmailEvent extends ApplicationEvent {
 	private final AssignmentDto assignmentDto;
 	private final User assignmentUser;
 	
-	public EmailEvent(final List<User> users,final AssignmentDto assignmentDto,final User assignmentUser) {
+	
+	public AssignmentEmailNotificationEvent(final List<User> users,final AssignmentDto assignmentDto,final User assignmentUser) {
 		 super(users);
 		 this.users = users;
 		 this.assignmentDto = assignmentDto;
@@ -37,7 +38,4 @@ public class EmailEvent extends ApplicationEvent {
 	public User getAssignmentUser() {
 		return assignmentUser;
 	}
-	
-	
-	
 }

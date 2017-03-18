@@ -91,6 +91,7 @@ public class EmailService {
                      message.setTo(user.getEmail());
                      message.setFrom(env.getProperty("support.email"));
                      
+                     
                      final Locale locale = new Locale(Locale.ENGLISH.toString());
                      
                      final Context ctx = new Context(locale);
@@ -117,5 +118,4 @@ public class EmailService {
          }
          mailSender.send(preparators);
      }
-
 }
