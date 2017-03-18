@@ -301,6 +301,7 @@ public class StudentController {
 				Document document = saveFileToDatabase(fileInfo);
 				
 				
+				
 				// adding the file info to the list
 				uploadedFiles.add(fileInfo);
 			}

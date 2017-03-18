@@ -25,13 +25,11 @@
                         <p>Dear <b data-th-text="${assignmentCreator}">Sir</b>,</p>
                        
                        <p> <b data-th-text="${studentName}"> student name </b> associated with <b data-th-text="${studentEmail}"> example@daffodil.ac</b> has successfully 
-                       submitted his/her assignment on <b data-th-text="${title}"> title</b> at <b data-th-text="${todayDate}"> today</b> .</p>	
+                       submitted his/her assignment on <b data-th-text="${title}"> title</b> at <b data-th-text="${todayDate}">today</b> .</p>	
                       
-                     <p>For assignment details <b><a th:href="${viewAssignmentUrl}">click here !</a></b></p> 
+                     <!-- <p>For assignment details <b><a th:href="${url}">click here !</a></b></p>  -->
                     
-					<p>
-                        * This is an automatically generated email.Please do not reply to it.
-                    </p>
+					<p>* This is an automatically generated email.Please do not reply to it.</p>
                         
                     </div>
                     

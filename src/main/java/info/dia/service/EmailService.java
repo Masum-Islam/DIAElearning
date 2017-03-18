@@ -1,5 +1,6 @@
 package info.dia.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,20 +47,27 @@ public class EmailService {
 	private TemplateEngine templateEngine;
 	 
 	 
-	 public void sendEmail(String to, String subject, String content)
+	 public void sendPasswordResetEmail(final User user, final String url)
 		{
 	        try
 			{
-	        	// Prepare message using a Spring helper
-	        	
-	        	LOGGER.info("Sending email....."+env.getProperty("support.email"));
 	        	
 	            final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
 	            final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
-	            message.setSubject(subject);
+	            message.setSubject("Password Reset Link");
 	            message.setFrom(env.getProperty("support.email"));
-	            message.setTo(to);
-	            message.setText(content, true /* isHtml */);
+	            message.setTo(user.getEmail());
+	            
+	            final Locale locale = new Locale(Locale.ENGLISH.toString());
+	            
+                final Context ctx = new Context(locale);
+                ctx.setVariable("resetUserName", user.getFirstName()+" "+(user.getLastName()!=null?user.getLastName():" "));
+                ctx.setVariable("passResetLink", url);
+                
+                
+                final String htmlContent = templateEngine.process("resetPasswordEmail",ctx);
+                
+                message.setText(htmlContent, true /* isHtml */);
 	            
 	            message.addInline("background", new ClassPathResource(BACKGROUND_IMAGE), PNG_MIME);
 	            message.addInline("logo-background", new ClassPathResource(LOGO_BACKGROUND_IMAGE), PNG_MIME);
@@ -118,4 +126,58 @@ public class EmailService {
          }
          mailSender.send(preparators);
      }
+	 
+	 
+	 public void sendDocumentUploadEmail(final User uploadUser,User assignmentUser,String title)
+		{
+	        try
+			{
+	        	
+	         final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+	         final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true /* multipart */, "UTF-8");
+	         
+	         StringBuilder studentName = new StringBuilder();
+	         
+	         studentName.append(uploadUser.getFirstName());
+	         studentName.append(" ");
+	         studentName.append(uploadUser.getLastName());
+	         
+	         StringBuilder teacherName = new StringBuilder();
+	         
+	         teacherName.append(assignmentUser.getFirstName());
+	         teacherName.append(" ");
+	         teacherName.append(assignmentUser.getLastName());
+	         
+	         
+	         message.setSubject("Assignment Uploaded By " +studentName);
+	         message.setFrom(env.getProperty("support.email"));
+	         message.setTo(assignmentUser.getEmail());
+	            
+	         final Locale locale = new Locale(Locale.ENGLISH.toString());
+	            
+             final Context ctx = new Context(locale);
+             ctx.setVariable("assignmentCreator",teacherName.toString());
+             ctx.setVariable("studentName",studentName.toString());
+             ctx.setVariable("studentEmail",uploadUser.getEmail());
+             ctx.setVariable("title",title);
+             ctx.setVariable("todayDate", new Date());
+             
+             final String htmlContent = templateEngine.process("studentDocumentUploadEmail",ctx);
+             
+             message.setText(htmlContent, true /* isHtml */);
+	            
+	         message.addInline("background", new ClassPathResource(BACKGROUND_IMAGE), PNG_MIME);
+	         message.addInline("logo-background", new ClassPathResource(LOGO_BACKGROUND_IMAGE), PNG_MIME);
+	         message.addInline("eLearning_Banner", new ClassPathResource(ELEARNING_BANNER_IMAGE), PNG_MIME);
+	         message.addInline("eLearning_Logo", new ClassPathResource(ELEARNING_LOGO_IMAGE), PNG_MIME);
+	            
+	            
+	         mailSender.send(message.getMimeMessage());
+			} 
+	        catch (MailException | MessagingException e)
+			{
+	        	LOGGER.error(e.toString());
+			}
+		}
+	 
 }

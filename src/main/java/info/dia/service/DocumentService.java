@@ -3,6 +3,7 @@ package info.dia.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import info.dia.persistence.dao.DocumentRepository;
 import info.dia.persistence.model.Assignment;
 import info.dia.persistence.model.AssignmentStudent;
 import info.dia.persistence.model.Document;
+import info.dia.persistence.model.User;
 import info.dia.web.dto.DocumentDto;
 import info.dia.web.dto.StudentDocumentDto;
 
@@ -29,6 +31,12 @@ public class DocumentService implements IDocumentService {
 	
 	@Autowired
 	private AssignmentStudentRepository assignmentStudentRepository;
+	
+	@Autowired
+	private IUserService userService;
+	
+	@Autowired 
+	private EmailService emailService;
 
 	@Override
 	public Document saveOrUpdate(DocumentDto documentDto) {
@@ -119,15 +127,12 @@ public class DocumentService implements IDocumentService {
 				Assignment assignment = assignmentRepository.findOne(studentDocumentDto.getAssignmentId());
 				document.setAssignment(assignment);
 				
+				User assignmentUser = userService.findUserByEmail(assignment.getUser().getEmail());
+				User uploadUser = userService.getUserByID(studentDocumentDto.getUserId());
+				emailService.sendDocumentUploadEmail(uploadUser, assignmentUser,assignment.getTitle());
+				
 			}
-			
-			
-			
 		}
-		
-		
-		
-		
 		AssignmentStudent assignmentStudent = assignmentStudentRepository.findOne(studentDocumentDto.getAssignmentStudentId());
 		assignmentStudent.setStatus(true);
 		assignmentStudent.setSubmitDate(new Date());
@@ -147,5 +152,9 @@ public class DocumentService implements IDocumentService {
 	public List<Document> getAllDocumentsByUserIdAndAssignmentIdAndStatus(Long userId, Long assignmentId, int status) {
 		return documentRepository.findAllByUserIdAndAssignmentIdAndStatus(userId, assignmentId, status);
 	}
+	
+	private String getAppUrl(HttpServletRequest request) {
+        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
 
 }

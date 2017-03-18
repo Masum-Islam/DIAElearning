@@ -23,7 +23,9 @@
                     
                     <div style="padding: 15px 15px 30px 15px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size:1em; background-color: #fff; color:#333;">
                         <p>Dear <b data-th-text="${name}?${name}:'Student'">Peter</b>!</p>
-                       	
+                       	<div>
+                       		<p>You have an assignment by <b data-th-text="${assignmentCreator}">Peter</b> . Furthermore assignment information has given bellow.</p>
+                       	</div>
                        	
 					<table border="1" width="100%">
 						<caption>Assignment Information.</caption>
@@ -42,9 +44,7 @@
 					</table>
 
 
-						<p>
-                            
-                        </p>
+						<p>* This is an automatically generated email.Please do not reply to it.</p>
                         
                     </div>
                     

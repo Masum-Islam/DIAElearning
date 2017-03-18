@@ -16,7 +16,7 @@ $(document).ready(function() {
 		this.classList.remove('drag-over');
 	}
 	
-	
+	ajaxSetUp();
 
 	// "AuthorizationdropzoneForm" is the camel-case version of the form id "dropzone-form"
 	Dropzone.options.myAwesomeDropzone  = {
@@ -159,11 +159,10 @@ $(document).ready(function() {
 			init : function() {
 
 				var myDropzone = this;
-				
 
 				// first set autoProcessQueue = false
 				$('#student-document-upload-button').on("click", function(e) {
-
+					/*$btn.button('loading');*/
 					myDropzone.processQueue();
 					
 				});
@@ -181,17 +180,20 @@ $(document).ready(function() {
 				this.on("error", function(file, response) {
 	                // do stuff here.
 	                errorMsg(response);
+	                /*$btn.button('reset');*/
 	            });
 				
 				// displaying the uploaded files information in a Bootstrap dialog
 				this.on("success", function(files, serverResponse) {
 					successMsg("Assignment Document Upload Successfully");
+					/*$btn.button('reset');*/
 					/*showInformationDialog(files, serverResponse);*/
 				});
 				
 				this.on("complete", function(file) {
 					this.removeFile(file);
 					retrieveStudentExistsAssignmentDocument();
+					/*$btn.button('reset');*/
 				});
 				
 			}
@@ -268,3 +270,4 @@ $(document).ready(function() {
 	
 
 });
+

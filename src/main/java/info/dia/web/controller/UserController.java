@@ -116,14 +116,15 @@ public class UserController {
         final String token = UUID.randomUUID().toString();
         userService.createPasswordResetTokenForUser(user, token);
         
+        final String url = getAppUrl(request) + "/user/changePassword?id=" + user.getId() + "&token=" + token;
+        emailService.sendPasswordResetEmail(user,url);
+        
         return new GenericResponse(messages.getMessage("message.resetPasswordEmail", null, request.getLocale()));
     }
     
     // Change password page
     @RequestMapping(value = "/user/changePassword", method = RequestMethod.GET)
-    @PreAuthorize("hasAuthority('CHANGE_PASSWORD_PRIVILEGE')")
     public String showChangePasswordPage(final Locale locale, final Model model, @RequestParam("id") final long id, @RequestParam("token") final String token) {
-    	LOGGER.info("/updatePassword method called....");
         final String result = securityUserService.validatePasswordResetToken(id, token);
         LOGGER.info("Result :"+result);
         if (result != null) {
@@ -161,8 +162,6 @@ public class UserController {
     @RequestMapping(value = "/user/updatePersonalInfo", method = RequestMethod.POST)
     @ResponseBody
     public GenericResponse updateUserPersonalInformation(final Locale locale, @Valid ProfileDto profileDto) {
-    	
-    	LOGGER.info("Inside Method");
     	
         final User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         
@@ -252,6 +251,8 @@ public class UserController {
 
     
     // ============== NON-API ============
-   
+    private String getAppUrl(HttpServletRequest request) {
+        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+    }
     
 }
