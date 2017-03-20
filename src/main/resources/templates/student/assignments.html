@@ -79,7 +79,7 @@
 
 										<td data-title="Actions" >
 											<a class="btn btn-icon-only blue" data-toggle="tooltip" data-placement="top" title="View Assignment Details" th:href="@{/student/assignment/} + ${assignmentStudent.id}"><span class="fa fa-eye"></span></a>
-											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File To Assignment" th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}"><span class="fa fa-file"></span></a>
+											<a class="btn btn-icon-only default" data-toggle="tooltip" data-placement="top" title="Add File To Assignment" th:href="@{/student/addDocument(assignmentId=${assignmentStudent.assignment.id})}"><span class="fa fa-file"></span></a>
 										</td>
 									</tr>
 								</tbody>

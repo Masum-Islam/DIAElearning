@@ -1,17 +1,21 @@
 package info.dia.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import com.mysema.query.jpa.JPASubQuery;
-import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Predicate;
 
 import info.dia.persistence.dao.PasswordResetTokenRepository;
@@ -19,17 +23,22 @@ import info.dia.persistence.dao.RoleRepository;
 import info.dia.persistence.dao.UserRepository;
 import info.dia.persistence.dao.VerificationTokenRepository;
 import info.dia.persistence.model.PasswordResetToken;
-import info.dia.persistence.model.QRole;
 import info.dia.persistence.model.QUser;
+import info.dia.persistence.model.Role;
 import info.dia.persistence.model.User;
 import info.dia.persistence.model.VerificationToken;
 import info.dia.web.dto.UserDto;
+import info.dia.web.dto.UserStatusDto;
+import info.dia.web.dto.UsersDto;
 import info.dia.web.error.UserAlreadyExistException;
 
 @Service
 @Transactional
 public class UserService implements IUserService {
 
+	
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+	
     @Autowired
     private UserRepository repository;
 
@@ -65,7 +74,7 @@ public class UserService implements IUserService {
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
-        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
+        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_STUDENT")));
         
         return repository.save(user);
     }
@@ -211,6 +220,41 @@ public class UserService implements IUserService {
 		
 		
 		return repository.findAll(predicate);
+	}
+
+	@Override
+	public List<UserStatusDto> registerNewUserAccounts(UsersDto usersDto) {
+		List<UserStatusDto> users = null;
+		if (!StringUtils.isEmpty(usersDto.getEmails())) {
+			users = new ArrayList<>();
+			List<String> emailList = Arrays.asList(usersDto.getEmails().split("\\s*,\\s*"));
+			for (String email : emailList) {
+				UserStatusDto usersDtoStatus = new UserStatusDto();
+				usersDtoStatus.setEmail(email);
+				if (!emailExist(email)) {
+					User user = new User();
+					user.setEmail(email);
+					for (Role role : usersDto.getRoles()) {
+						user.setRoles(Arrays.asList(roleRepository.findByName(role.getName())));
+						usersDtoStatus.setRoleName(role.getName());
+					}
+					user.setPassword(passwordEncoder.encode(email));
+					user.setEnabled(true);
+					repository.save(user);
+					usersDtoStatus.setUserCreateOrNot(true);
+		        }else {
+		        	usersDtoStatus.setRoleName("");
+					usersDtoStatus.setUserCreateOrNot(false);
+				}
+				users.add(usersDtoStatus);
+			}
+		}
+		return users;
+	}
+
+	@Override
+	public Page<User> getAllUser(Pageable pageable) {
+		return repository.findAll(pageable);
 	}
 
 }

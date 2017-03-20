@@ -15,6 +15,22 @@
            <script th:src="@{/assets/selectize/js/standalone/selectize.js}"></script>
            <script th:src="@{/assets/js/custom_js/users.js}"></script>
            
+           <style type="text/css">
+           		.glyphicon.spinning {
+					 animation: spin 1s infinite linear;
+					 -webkit-animation: spin2 1s infinite linear;
+				}
+					
+				@keyframes spin {
+					 from { transform: scale(1) rotate(0deg); }
+					 to { transform: scale(1) rotate(360deg); }
+				}
+					
+				@-webkit-keyframes spin2 {
+					 from { -webkit-transform: rotate(0deg); }
+					 to { -webkit-transform: rotate(360deg); }
+				}
+           </style>
 	</th:block>
 	
 	
@@ -44,7 +60,7 @@
 
 						<div class="portlet-body form">
 							<!-- action="@{/teacher/assignment}" method="post" -->
-							<form role="form" id="assignmentForm" th:object="${users}"  >
+							<form role="form" id="createUsersForm" th:object="${usersDto}"  >
 								<div class="form-body">
 									<div class="row">
 										<div class="col-md-8">
@@ -59,7 +75,7 @@
 											<!--Column right-->
 											<div class="control-group">
 												<label for="select-role">Role:</label>
-												<select id="select-role" placeholder="Select a role...">
+												<select id="select-role" th:field="*{roles}" placeholder="Select a role...">
 													<option value="">Select a role...</option>
 													<option th:each="role : *{roles}" th:value="${role.id}" th:text="${role.name}">Role</option>
 												</select>
@@ -67,14 +83,46 @@
 										</div>
 										<div class="col-md-2">
 											<div class="form-actions" style="text-align: right;">
-												<button type="submit" id="create-user"
-													class="btn btn-primary">Create User(s)</button>
+												<button type="submit" data-loading-text="<span class='glyphicon glyphicon-refresh spinning'></span>Processing Request..." id="create-user"	class="btn btn-primary">Create User(s)</button>
 											</div>
 										</div>
 									</div>
 								</div>
 							</form>
 						</div>
+
+						<!-- <table id="userCreateResponse" class="table-bordered table-striped table-condensed cf">
+						
+						</table> -->
+							<div class="modal fade" id="userCreateResponseModalTable">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+											<h3 class="modal-title">User Create Response</h3>
+										</div>
+										<div class="modal-body">
+											<table id="userCreateResponse" class="table-bordered table-striped table-condensed cf">
+												<thead class="cf">
+													<tr>
+														<th>Email</th>
+														<th>Role</th>
+														<th>Status</th>
+													</tr>
+												</thead>
+												<tbody>
+													
+												</tbody>
+											</table>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-default "	data-dismiss="modal">Ok</button>
+										</div>
+									</div>
+									<!-- /.modal-content -->
+								</div>
+								<!-- /.modal-dialog -->
+							</div>
 					</div>
 				</div>
 			</div>

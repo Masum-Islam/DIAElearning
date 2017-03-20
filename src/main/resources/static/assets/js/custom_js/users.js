@@ -9,8 +9,8 @@ $(document)
 							.selectize(
 									{
 										persist : false,
-										delimiter:',',
-										plugins: ['remove_button'],
+										delimiter : ',',
+										plugins : [ 'remove_button' ],
 										maxItems : null,
 										valueField : 'email',
 										labelField : 'name',
@@ -86,11 +86,45 @@ $(document)
 											return false;
 										}
 									});
-					
-					
 					$('#select-role').selectize({
-						
-					});
-					
 
-				});
+		});
+
+});
+
+$(document).on('submit', '#createUsersForm', function(e) {
+	 e.preventDefault();
+	 
+	 var formData= $('#createUsersForm').serialize();
+	 
+	 $.ajax({
+         type : "POST",
+         beforeSend : function() {
+ 			
+ 		 },
+         url : "/admin/createUser",  
+         data : formData,
+         dataType : 'json',
+         success : function(data) {
+        	 var tblHtml="";
+             $.each(data,function(index, users){
+            	 	   var status = users.userCreateOrNot ? "Create" : "Exist";
+                       tblHtml+= "<tr><td>"+users.email+"</td>";
+                       tblHtml+= "<td>"+users.roleName+"</td>";
+                       tblHtml+= "<td>"+status+"</td>M/tr>";
+             });
+             
+             $("#userCreateResponseModalTable  tbody").html(tblHtml);
+        	 $("#userCreateResponseModalTable").modal('show');
+         },
+         error : function(data) {
+             var errors = $.parseJSON(data.responseJSON.message);
+             $.each( errors, function( index,item ){
+                 errorMsg(item.defaultMessage);
+             });
+         },
+         done : function(e) {
+             console.log("DONE");
+         }
+     });
+});

@@ -14,6 +14,23 @@
 		<script th:src="@{/assets/js/dropzone.js}" type="text/javascript"></script>
 		<script th:src="@{/assets/js/custom_js/dropzoneApp.js}" type="text/javascript"></script>
 		
+		<style type="text/css">
+			.glyphicon.spinning {
+			    animation: spin 1s infinite linear;
+			    -webkit-animation: spin2 1s infinite linear;
+			}
+			
+			@keyframes spin {
+			    from { transform: scale(1) rotate(0deg); }
+			    to { transform: scale(1) rotate(360deg); }
+			}
+			
+			@-webkit-keyframes spin2 {
+			    from { -webkit-transform: rotate(0deg); }
+			    to { -webkit-transform: rotate(360deg); }
+			}
+		</style>
+		
 	</th:block>
 	
 	<div layout:fragment="content">
@@ -23,10 +40,10 @@
 					<!-- BEGIN SAMPLE FORM PORTLET-->
 					<div class="portlet light ">
 						<div class="portlet-title">
-							<div class="caption font-red-sunglo">
+							<div class="caption font-red-sunglo" th:if="${documentSubmitOnAssignment !=null}">
 								<i class="icon-settings font-red-sunglo"></i>
 								<span class="caption-subject font-blue-madison bold">Upload Your Document On</span>
-								<span class="caption-subject font-blue-madison bold" th:text="${documentSubmitOnAssignment.title}"></span>
+								<span class="caption-subject font-blue-madison bold" th:text="${documentSubmitOnAssignment.assignment.title}"></span>
 							</div>
 							<div class="actions">
 								<div class="btn-group">
@@ -41,7 +58,7 @@
 							</div>
 						</div>
 
-						<div class="portlet-body form">
+						<div class="portlet-body form" th:if="${studentDocumentDto !=null}">
 							<span class="label label-danger">Maximum file size is 25MB</span>
 							<!--  -->
 							<form id="student-assignment-document-dropzone" class="dropzone"	th:object="${studentDocumentDto}" th:action="@{/student/uploadStudentAssignmentDocument(assignmentId=${studentDocumentDto.assignmentId},assignmentStudentId=${studentDocumentDto.assignmentStudentId},id=${studentDocumentDto.id})}"  enctype="multipart/form-data">
@@ -78,7 +95,7 @@
 									</div>
 								</div>
 								<div class="col-md-4" th:style="'text-align:right'">
-										<button id="student-document-upload-button" data-loading-text="Processing Request..." class="btn btn-primary"><span class="glyphicon glyphicon-upload"></span>Upload</button>
+										<button id="student-document-upload-button" data-loading-text="<span class='glyphicon glyphicon-refresh spinning'></span>Uploading..." class="btn btn-primary"><span class="glyphicon glyphicon-upload"></span>Upload</button>
 								</div>
 							</div>
 						</div>

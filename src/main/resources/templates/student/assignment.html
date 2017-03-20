@@ -42,7 +42,7 @@
 									<span th:text="${assignmentStudent.assignment.title}"></span>
 								</div>
 								<div class="actions">
-									<a th:href="@{/student/addDocument(assignmentStudentId=${assignmentStudent.id},assignmentId=${assignmentStudent.assignment.id})}" class="btn btn-info btn-sm"> <i
+									<a th:href="@{/student/addDocument(assignmentId=${assignmentStudent.assignment.id})}" class="btn btn-info btn-sm"> <i
 										class="fa fa-pencil"></i>Submit Assignment
 									</a>
 								</div>

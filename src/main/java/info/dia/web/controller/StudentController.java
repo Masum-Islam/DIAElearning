@@ -218,25 +218,27 @@ public class StudentController {
 	
 	//Student Assignment Document
 	@RequestMapping(value="/addDocument",method=RequestMethod.GET)
-	public String addDocumentsToAssignment(Model model,@RequestParam(value="assignmentStudentId") Long assignmentStudentId,@RequestParam(value="assignmentId") Long assignmentId){
+	public String addDocumentsToAssignment(Model model,@RequestParam(value="assignmentId") Long assignmentId){
 		
 			Authentication authentication = authenticationFacade.getAuthentication();
 			StudentDocumentDto studentDocumentDto = null;
 			Document document = null;
-			Assignment documentSubmitOnAssignment = null;
+			AssignmentStudent documentSubmitOnAssignment = null;
 			
 			if (!(authentication instanceof AnonymousAuthenticationToken)) {
 				User user = userService.findUserByEmail(authentication.getName());
 				
-				documentSubmitOnAssignment = assignmentService.getAssignmentById(assignmentId);
-				
-				studentDocumentDto = new StudentDocumentDto();
-				studentDocumentDto.setAssignmentId(assignmentId);
-				studentDocumentDto.setAssignmentStudentId(assignmentStudentId);
-				
-				document = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId, user.getId());
-				if (document!=null) {
-					studentDocumentDto.setId(document.getId());
+				/*documentSubmitOnAssignment = assignmentService.getAssignmentById(assignmentId);*/
+				documentSubmitOnAssignment = assignmentStudentService.getAssignmentStudentByEmailAndAssignmentId(user.getEmail(),assignmentId);
+				if (documentSubmitOnAssignment!=null) {
+					studentDocumentDto = new StudentDocumentDto();
+					studentDocumentDto.setAssignmentId(documentSubmitOnAssignment.getAssignment().getId());
+					studentDocumentDto.setAssignmentStudentId(documentSubmitOnAssignment.getId());
+					
+					document = uploadService.getDocumentByAssignmentIdAndUserId(assignmentId,user.getId());
+					if (document!=null) {
+						studentDocumentDto.setId(document.getId());
+					}
 				}
 			}
 		model.addAttribute("documentSubmitOnAssignment",documentSubmitOnAssignment);	
