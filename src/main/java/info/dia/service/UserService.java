@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Predicate;
 
 import info.dia.persistence.dao.PasswordResetTokenRepository;
@@ -28,6 +29,7 @@ import info.dia.persistence.model.Role;
 import info.dia.persistence.model.User;
 import info.dia.persistence.model.VerificationToken;
 import info.dia.web.dto.UserDto;
+import info.dia.web.dto.UserSearchDTO;
 import info.dia.web.dto.UserStatusDto;
 import info.dia.web.dto.UsersDto;
 import info.dia.web.error.UserAlreadyExistException;
@@ -213,8 +215,6 @@ public class UserService implements IUserService {
 	public Iterable<User> searchEmail(String filter) {
 		
 		QUser qUser = QUser.user;
-		
-
 		Predicate predicate = qUser.email.containsIgnoreCase(filter)
 				   .and(qUser.roles.any().name.eq("ROLE_STUDENT"));
 		
@@ -255,6 +255,28 @@ public class UserService implements IUserService {
 	@Override
 	public Page<User> getAllUser(Pageable pageable) {
 		return repository.findAll(pageable);
+	}
+
+	@Override
+	public Page<User> searchUser(UserSearchDTO searchDTO, Pageable pageable) {
+		// TODO User search method
+		BooleanBuilder b = new BooleanBuilder();
+		QUser qUser = QUser.user;
+		if (searchDTO!=null) {
+			if (!StringUtils.isEmpty(searchDTO.getSearchString()) && searchDTO.getStatus()!=null) {
+				b = b.and(qUser.email.containsIgnoreCase(searchDTO.getSearchString())
+						.or(qUser.firstName.containsIgnoreCase(searchDTO.getSearchString()))
+						.or(qUser.lastName.containsIgnoreCase(searchDTO.getSearchString()))
+						.or(qUser.enabled.eq(searchDTO.getStatus())));
+			}else if (!StringUtils.isEmpty(searchDTO.getSearchString())) {
+				b = b.and(qUser.email.containsIgnoreCase(searchDTO.getSearchString())
+						.or(qUser.firstName.containsIgnoreCase(searchDTO.getSearchString()))
+						.or(qUser.lastName.containsIgnoreCase(searchDTO.getSearchString())));
+			}else if (searchDTO.getStatus()!=null) {
+				b = b.and(qUser.enabled.eq(searchDTO.getStatus()));
+			}
+		}
+		return repository.findAll(b,pageable);
 	}
 
 }

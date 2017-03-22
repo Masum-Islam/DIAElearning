@@ -2,6 +2,7 @@ package info.dia.web.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +26,7 @@ import info.dia.persistence.model.User;
 import info.dia.service.IRoleService;
 import info.dia.service.IUserService;
 import info.dia.web.dto.SearchDTO;
+import info.dia.web.dto.UserSearchDTO;
 import info.dia.web.dto.UserStatusDto;
 import info.dia.web.dto.UsersDto;
 import info.dia.web.util.HelperUtils;
@@ -35,10 +38,10 @@ public class AdminController {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
-	private static final int BUTTONS_TO_SHOW = 5;
+	private static final int BUTTONS_TO_SHOW = 9;
 	private static final int INITIAL_PAGE = 0;
-	private static final int INITIAL_PAGE_SIZE = 5;
-	private static final int[] PAGE_SIZES = { 5, 10, 20 };
+	private static final int INITIAL_PAGE_SIZE = 10;
+	private static final int[] PAGE_SIZES = { 10, 20, 30 };
 	private static final String DEFAULT_SORT_STRING = "id";
 	
 	
@@ -69,9 +72,52 @@ public class AdminController {
 		
 		model.addAttribute("users", users);
 		model.addAttribute("pager", pager);
+		model.addAttribute("searchDTO", new UserSearchDTO());
 		
 		return "admin/users";
 	}
+	
+	@RequestMapping(value = "/allUsers/search",method=RequestMethod.GET)
+	public String search(
+			Model model,
+			HttpSession session,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "sortString", required = false) String sortString,
+			@RequestParam(value = "oldSortString", required = false) String oldSortString,
+			@RequestParam(value = "oldDirection", required = false) Direction oldDirection,
+			@ModelAttribute("searchDTO") UserSearchDTO searchDTO) {
+		
+		
+		/*LOGGER.info("Search Method Called!"+" with search string :"+searchDTO.getSearchString()+" and boolean value:"+searchDTO.getAssignmentStatus());*/
+		
+		UserSearchDTO sessionSearchDTO = (UserSearchDTO) session.getAttribute("searchDTO");
+		
+		if (sessionSearchDTO != null && page != null) {
+			searchDTO = sessionSearchDTO;
+		}
+		
+		PageRequest pageRequest = HelperUtils.createPageRequest(model, page,sortString, oldSortString, oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
+		
+		return searchUser(model, session, searchDTO, pageRequest);
+	}
+	
+	
+	public String searchUser(Model model, HttpSession session, UserSearchDTO searchDTO,PageRequest pageRequest){
+		
+    		
+		Page<User> users = userService.searchUser(searchDTO, pageRequest);	
+		info.dia.web.util.Pager pager = new info.dia.web.util.Pager(users.getTotalPages(),users.getNumber(),BUTTONS_TO_SHOW);	
+    	
+		model.addAttribute("users", users);
+		model.addAttribute("pager", pager);
+		model.addAttribute("searchDTO", searchDTO != null ? searchDTO: new User());
+		model.addAttribute("isSearch", "true");
+		session.setAttribute("searchDTO", searchDTO);
+		
+    	return "admin/users";
+	}
+
+	
 	
 	@RequestMapping(value="/createUser",method=RequestMethod.GET)
 	public String createUser(Model model){

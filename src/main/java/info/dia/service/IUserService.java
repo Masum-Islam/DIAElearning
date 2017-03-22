@@ -9,6 +9,7 @@ import info.dia.persistence.model.PasswordResetToken;
 import info.dia.persistence.model.User;
 import info.dia.persistence.model.VerificationToken;
 import info.dia.web.dto.UserDto;
+import info.dia.web.dto.UserSearchDTO;
 import info.dia.web.dto.UserStatusDto;
 import info.dia.web.dto.UsersDto;
 import info.dia.web.error.UserAlreadyExistException;
@@ -54,6 +55,8 @@ public interface IUserService {
     Iterable<User> searchEmail(String filter);
     
     Page<User> getAllUser(Pageable pageable);
+    
+    Page<User> searchUser(UserSearchDTO searchDTO,Pageable pageable);
     
 }
 

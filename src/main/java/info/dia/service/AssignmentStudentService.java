@@ -149,7 +149,7 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 	@Override
 	public Page<AssignmentStudent> getAllStudentAssignmentByEmailAndAssignmentStatus(String email,boolean status,Pageable pageable) {
 		// TODO Assignment student by email and status
-		return assignmentStudentRepository.findAllByEmailAndStatus(email,status,pageable);
+		return assignmentStudentRepository.findAllByEmailAndStatusAndAssignmentStatusTrue(email,status,pageable);
 	}
 
 

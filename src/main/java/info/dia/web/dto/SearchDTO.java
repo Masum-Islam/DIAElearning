@@ -26,7 +26,4 @@ public class SearchDTO {
 		return "SearchDTO [searchString=" + searchString + ", assignmentStatus=" + assignmentStatus + "]";
 	}
 	
-	
-	
-	
 }

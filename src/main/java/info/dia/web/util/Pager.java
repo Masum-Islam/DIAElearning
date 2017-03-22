@@ -8,7 +8,7 @@ package info.dia.web.util;
  */
 public class Pager {
 
-	private int buttonsToShow = 5;
+	private int buttonsToShow = 9;
 
 	private int startPage;
 

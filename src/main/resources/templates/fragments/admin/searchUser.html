@@ -7,20 +7,20 @@
 	<div th:fragment="searchUser">
 		<div class="row">
 			<div class="col-md-10">
-				<form id="searchForm" class="form-inline" role="form" action="#" th:action="@{/teacher/assignments/search}" th:object="${searchDTO}">
+				<form id="searchForm" class="form-inline" role="form" action="#" th:action="@{/admin/allUsers/search}" th:object="${searchDTO}">
 					
 						<div class="input-group col-md-4">
 							<input id="searchAssignment" type="text"
 								th:field="*{searchString}" class="form-control"
-								placeholder="Search assignment by title or session..."> <span
+								placeholder="Search user by name or email..."> <span
 								class="input-group-btn"> </span>
 						</div>
 						
 						<div class="input-group">
 							<!-- <span th:text="${searchDTO.assignmentStatus}"></span> -->
 							<div class="btn-group" data-toggle="buttons">
-								<label th:class="${searchDTO.assignmentStatus} ? 'btn blue active' : 'btn blue'"><input type="radio" id="q_op_0" name="assignmentStatus" th:field="*{assignmentStatus}"	value="true" class="toggle">Published</label>
-								<label th:class="${searchDTO.assignmentStatus==false} ? 'btn blue active' : 'btn blue'"><input type="radio" id="q_op_1"  name="assignmentStatus" th:field="*{assignmentStatus}"	value="false" class="toggle">Saved</label>
+								<label th:class="${searchDTO.status} ? 'btn blue active' : 'btn blue'"><input type="radio" id="q_op_0" name="status" th:field="*{status}"	value="true" class="toggle">Active</label>
+								<label th:class="${searchDTO.status==false} ? 'btn blue active' : 'btn blue'"><input type="radio" id="q_op_1"  name="status" th:field="*{status}"	value="false" class="toggle">Inactive</label>
 							</div>
 						</div>
 						<button data-placement="top" data-toggle="tooltip" data-original-title="Filter" class="btn btn-default" type="submit">
@@ -31,7 +31,7 @@
 			</div>
 
 			<div class="col-md-2">
-				<a data-placement="top" data-toggle="tooltip" data-original-title="Refresh" class="btn btn-default pull-right" th:href="@{/teacher/assignments}">
+				<a data-placement="top" data-toggle="tooltip" data-original-title="Refresh" class="btn btn-default pull-right" th:href="@{/admin/allUsers}">
 					<i class="glyphicon glyphicon-refresh"></i>
 				</a>
 			</div>

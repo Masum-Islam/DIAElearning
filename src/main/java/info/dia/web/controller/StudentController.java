@@ -58,10 +58,10 @@ public class StudentController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 	
-	private static final int BUTTONS_TO_SHOW = 5;
+	private static final int BUTTONS_TO_SHOW = 9;
 	private static final int INITIAL_PAGE = 0;
-	private static final int INITIAL_PAGE_SIZE = 5;
-	private static final int[] PAGE_SIZES = { 5, 10, 20 };
+	private static final int INITIAL_PAGE_SIZE = 10;
+	private static final int[] PAGE_SIZES = { 10, 20, 30 };
 	private static final String DEFAULT_SORT_STRING = "submitStartDate";
 	
 	@Autowired
