@@ -22,14 +22,14 @@ public interface AssignmentStudentRepository extends JpaRepository<AssignmentStu
 	
 	AssignmentStudent findByIdAndEmail(Long assignmentStudentId,String email);
 	
-	// Count Student Assignment by email
-	int countByEmail(String email);
+	// Count Student's published Assignment by email
+	int countByEmailAndAssignmentStatusTrue(String email);
 	
-	// Count Student Assignment by email and true
-	int countByEmailAndStatusTrue(String email);
+	// Count Student's published Assignment by email and true
+	int countByEmailAndStatusTrueAndAssignmentStatusTrue(String email);
 	
-	// Count Student Assignment by email and false
-	int countByEmailAndStatusFalse(String email);
+	// Count Student's published Assignment by email and false
+	int countByEmailAndStatusFalseAndAssignmentStatusTrue(String email);
 
 	
 }

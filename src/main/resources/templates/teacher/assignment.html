@@ -14,6 +14,14 @@
 	 
            
            <link th:href="@{/assets/selectize/css/selectize.default.css}" rel="stylesheet" type="text/css" />
+           <link th:href="@{/assets/summernote/css/summernote.css}" rel="stylesheet" type="text/css" />
+           
+           <link th:href="@{/assets/css/bootstrap-datetimepicker.min.css}" rel="stylesheet" type="text/css" />
+           <script th:src="@{/assets/js/bootstrap-datetimepicker.js}"></script> 
+           
+           <script th:src="@{/assets/summernote/js/summernote.js}"></script>
+           <script th:src="@{/assets/js/custom_js/custom_summernote.js}"></script>
+            
            <script th:src="@{/assets/selectize/js/standalone/selectize.js}"></script>
            <script th:src="@{/assets/js/custom_js/assignment.js}"></script>
            
@@ -88,11 +96,25 @@
 			
 		</style>
     
-        <!--<script type="text/javascript">
+        <script type="text/javascript">
            
-          
+        var date = new Date();
+        date.setDate(date.getDate()-1);
+
+        $('.form_date').datetimepicker({
+            /* format: "yyyy-mm-dd HH:ii", */
+            use24hours: true,
+            startDate: date,
+            weekStart: 1,
+            todayBtn:  1,
+        	autoclose: 1,
+        	todayHighlight: 1,
+        	startView: 2,
+        	forceParse: 0,
+            showMeridian: 1
+        });
 	      
-        </script> -->
+        </script>
            
            
 	</th:block>

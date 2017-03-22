@@ -198,7 +198,7 @@ public class TeacherController {
 		    		Page<Assignment> assignments = null;
 		    		PageRequest pageRequest = HelperUtils.createPageRequest(model,page,sortString,oldSortString,oldDirection,INITIAL_PAGE,INITIAL_PAGE_SIZE,DEFAULT_SORT_STRING);
 		    		
-		    		LOGGER.info("Status :"+status);
+		    		/*LOGGER.info("Status :"+status);*/
 		    		
 		    		if (status!=null) {
 						assignments = assignmentService.getAllAssignmentByUserAndStatus(user,status,pageRequest);

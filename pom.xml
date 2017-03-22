@@ -383,7 +383,11 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <excludes>
-                	<exclude>static/assets/fonts/**</exclude>
+                	<exclude>**/*.ttf</exclude>
+                    <exclude>**/*.eot</exclude>
+                    <exclude>**/*.woff</exclude>
+                    <exclude>**/*.woff2</exclude>
+                	<exclude>static/fonts/**</exclude>
             		<exclude>static/assets/font-awesome/fonts/**</exclude>
             		<exclude>static/assets/simple-line-icons/fonts/**</exclude>
             		<exclude>static/assets/summernote/font/**</exclude>
@@ -394,7 +398,11 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                	<include>static/assets/fonts/**</include>
+                    <include>**/*.ttf</include>
+                    <include>**/*.eot</include>
+                    <include>**/*.woff</include>
+                    <include>**/*.woff2</include>
+                	<include>static/fonts/**</include>
             		<include>static/assets/font-awesome/fonts/**</include>
             		<include>static/assets/simple-line-icons/fonts/**</include>
             		<include>static/assets/summernote/font/**</include>

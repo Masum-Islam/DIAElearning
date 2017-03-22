@@ -127,22 +127,22 @@ public class AssignmentStudentService implements IAssignmentStudentService {
 
 	@Override
 	public int countByEmail(String email) {
-		// TODO Count Student Assignment by email
-		return assignmentStudentRepository.countByEmail(email);
+		// TODO Count Student's published Assignment by email
+		return assignmentStudentRepository.countByEmailAndAssignmentStatusTrue(email);
 	}
 
 
 	@Override
 	public int countByEmailAndStatusTrue(String email) {
-		// TODO Count Student Assignment by email and true
-		return assignmentStudentRepository.countByEmailAndStatusTrue(email);
+		// TODO Count Student's published Assignment by email and true
+		return assignmentStudentRepository.countByEmailAndStatusTrueAndAssignmentStatusTrue(email);
 	}
 
 
 	@Override
 	public int countByEmailAndStatusFalse(String email) {
-		// TODO Count Student Assignment by email and false
-		return assignmentStudentRepository.countByEmailAndStatusFalse(email);
+		// TODO Count Student's published Assignment by email and false
+		return assignmentStudentRepository.countByEmailAndStatusFalseAndAssignmentStatusTrue(email);
 	}
 
 

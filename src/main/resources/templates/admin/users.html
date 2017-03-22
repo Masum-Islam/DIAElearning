@@ -8,8 +8,85 @@
 <title th:text="#{label.pages.admin.allUsers}">Title</title>
 </head>
 <body>
-	<div layout:fragment="content">
-		<h1>This is a admin All user page</h1>
+	
+	<th:block layout:fragment="script">
+           <link th:href="@{/assets/css/tableResponsive.css}" rel="stylesheet" type="text/css" />
+	</th:block>
+	
+<div layout:fragment="content">
+		
+		<div class="page-content-inner">
+			<div class="row">
+					<!-- BEGIN SAMPLE FORM PORTLET -->
+				<div class="portlet light ">
+						
+						<div class="portlet-title">
+							<div class="caption font-red-sunglo">
+								<i class="icon-settings font-red-sunglo"></i> <span
+									class="caption-subject font-blue-madison bold">E-learning Users</span>
+							</div>
+							<div class="actions">
+								<div class="btn-group">
+									<a class="btn btn-sm green btn-outline dropdown-toggle" href="javascript:;"
+										data-toggle="dropdown"> Actions <i
+										class="fa fa-angle-down"></i>
+									</a>
+									<ul class="dropdown-menu pull-right">
+										<li><a th:href="@{/admin/createUser}"><i class="fa fa-plus-circle"></i>Create User</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						
+						
+						
+						<div class="portlet-body form">
+							<div id="no-more-tables" class="row">
+							<table id="users" class="col-md-12 table-bordered table-striped table-condensed cf">
+
+								<thead class="cf">
+									<tr>
+										<th col>Name</th>
+										<th>Email</th>
+										<th>Role</th>
+										<th>Gender</th>
+										<th>Blood Group</th>
+										<th>Account Status</th>
+										
+										<th width="5%">
+											<span data-toggle="tooltip" data-placement="top" title="Actions" class="icon-wrench"></span>
+										</th>
+									</tr>
+								</thead>
+								<tbody th:if="${not #lists.isEmpty(users)}">
+									<tr th:each="user,rowStat : ${users}">
+										<!-- <td th:text="${rowStat.count}">1</td> -->
+										<td data-title="Name" th:text="${#strings.concat(user.firstName , user.lastName)}">first name</td>
+										<td data-title="Email" th:text="${user.email}">Email</td>
+										<td data-title="Role" th:text="${#strings.listJoin(user.roles,',')}">Role</td>
+										<td data-title="Gender" th:text="${user.gender}">Gender</td>
+										<td data-title="Blood Group" th:text="${user.bloodGroup}">Blood Group</td>
+										
+										<td data-title="Account Status" th:class="${user.enabled} ? 'label label-success' : 'label label-primary'"  th:if="${user.enabled} == true">Enabled</td>
+										<td data-title="Account Status" th:class="${user.enabled} ? 'label label-success' : 'label label-primary'"  th:if="${user.enabled} == false">Disabled</td>
+										
+										
+										<td data-title="Actions" >
+										</td>
+									</tr>
+								</tbody>
+								
+								<tbody th:if="${#lists.isEmpty(users)}">
+									<tr>
+										<td class="alert alert-warning" align="center" colspan="8">No User Found!</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+				</div>
+			</div>
+		</div>
 	</div>
+</div>
 </body>
 </html>
